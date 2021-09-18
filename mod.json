@@ -1,0 +1,13 @@
+{
+	"name": "CharRules",
+	"displayName": "Char Rules",
+	"version": "1.0.0",
+	"synchronyVersion": "0.39.1",
+	"description": "No description given.",
+	"author": "Nixill",
+	"dependencies": {},
+	"api": {"scriptPath":""},
+	"icon": "CharRulesIcon.png",
+	"banner": "CharRulesBanner.png",
+	"tags": []
+}
