@@ -1,0 +1,61 @@
+Main menu
+├─ Health options
+│  ├─ Starting health: (int, 0 for default)
+│  ├─ Starting max health: (int, 0 for default)
+│  ├─ Starting cursed health: (int, 0 for default)
+│  └─ Limit of max health: (int, 0 for default)
+├─ Inventory options
+│  ├─ Starting inventory: (string, empty for defaults)
+│  ├─ Item bans: (string, empty for defaults and single space for none)
+│  └─ Cursed slots: (string, empty for defaults and single space for none)
+├─ Rhythm options
+│  ├─ Fixed-beat: (default/no/yes)
+│  ├─ Beat multiplier: (int, 0 for default)
+│  └─ On song end: (default/suicide/nextFloor)
+├─ Groove chain options
+│  ├─ Groove chain level options
+│  │  ├─ Kills for first level: (int, 0 for default)
+│  │  ├─ Kills for more levels: (int, 0 for default)
+│  │  └─ Levels: (int, 0 for default)
+│  └─ Damage on drop
+│     ├─ Active: (default/no/yes)
+│     ├─ Damage dealt: (int, 1 is default)
+│     └─ Damage type: (damage type, SELF_DAMAGE is default)
+├─ Currency options
+│  ├─ Starting gold: (int, 0 is default)
+│  ├─ Die on gold pickup: (default/no/yes)
+│  ├─ Minimum currency drop: (int, 0 is default)
+│  └─ Free items from shops: (default/no/yes)
+├─ Action options
+│  ├─ Use options: (yes/no)
+│  ├─ Presets
+│  │  ├─ Most characters
+│  │  ├─ Diamond
+│  │  └─ Nocturna Bat
+│  ├─ Movements
+│  │  ├─ Primary
+│  │  │  ├─ Right
+│  │  │  ├─ Up
+│  │  │  ├─ Left
+│  │  │  └─ Down
+│  │  └─ Secondary
+│  │     ├─ Up-right
+│  │     ├─ Up-left
+│  │     ├─ Down-left
+│  │     └─ Down-right
+│  ├─ Non-movements
+│  │  ├─ Item 1
+│  │  ├─ Item 2/Switch
+│  │  ├─ Bombs
+│  │  ├─ Toggle/Throw
+│  │  ├─ Spell 1
+│  │  └─ Spell 2
+│  └─ Idle without breaking combo
+├─ De/buff options
+│  ├─ Curse
+│  │  └─ Allowed (default/no/yes/permanent)
+│  ├─ Dwarfism
+│  │  └─ Allowed (default/no/yes/permanent)
+│  └─ Freeze
+│     ├─ Allowed (default/no/yes)
+│     └─ Unfreeze on hit (default/no/yes)

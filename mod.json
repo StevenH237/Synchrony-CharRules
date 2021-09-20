@@ -2,11 +2,15 @@
 	"name": "CharRules",
 	"displayName": "Char Rules",
 	"version": "1.0.0",
-	"synchronyVersion": "0.39.1",
-	"description": "No description given.",
+	"synchronyVersion": "0.40.0",
+	"description": "Modifies gameplay rules using options for individual characters' rules.",
 	"author": "Nixill",
-	"dependencies": {},
-	"api": {"scriptPath":""},
+	"dependencies": {
+		"NixLib": "1.1.0"
+	},
+	"api": {
+		"scriptPath": "scripts"
+	},
 	"icon": "CharRulesIcon.png",
 	"banner": "CharRulesBanner.png",
 	"tags": []

@@ -1,18 +1,22 @@
+# Component `actionFilter` (CharacterComponents)
+
+## `actionFilter.ignoreActions`: Dictionary with [Action.Direction](relevant-flags.md#actiondirection) and [Action.Special](relevant-flags.md#actionspecial) keys and bool values
+
+
 # Component `attackable` (AttackComponents)
 
-## `attackable.flags`: [Attack.Flag](relevant-flags.md) bitmask
+## `attackable.flags`: [Attack.Flag](relevant-flags.md#attackflag) bitmask
 Which types of damage the character can take.
 
-All characters have Direct (1), Indirect (2), and Pain (512). Except for NocturnaBat, they also have Trap (64).
+All characters have Direct (1), Indirect (2), and Pain (512), totaling 515. Except for NocturnaBat, they also have Trap (64), totaling 579.
+
+The component itself defaults to Indirect (2).
 
 
 # Component `bypassStairLock` (DescentComponents)
 
-## `bypassStairLock.flags`: LevelExit.StairLock bitmask
-The flags are as follows.
-
-* 1 † Ignore sarcophagus, if applicable
-* 2 ‡ Ignore miniboss
+## `bypassStairLock.flags`: [LevelExit.StairLock](relevant-flags.md#levelexitstairlock) bitmask
+Aria and Coda use Sarcophagus (1), and Dove uses Miniboss (2), which is the component's default.
 
 
 # Component `cursedHealth` (HealthComponents)
@@ -22,6 +26,7 @@ Set this to add cursed hearts to the health bar.
 
 
 # Component `damageCountdown` (CharacterComponents)
+Does periodic damage to playable characters.
 
 ## `damageCountdown.damage`: int
 The actual damage done to the character.
@@ -29,26 +34,26 @@ The actual damage done to the character.
 ## `damageCountdown.countdownReset`: int
 The value to which the countdown should be reset.
 
-## `damageCountdown.type`: Damage.Type bitmask
-The type of damage which should be inflicted.
-
-* 0 Special
-* 1 Piercing
-* 3 Phasing
-* 32 Indirect
-* 40 Physical
-* 65 Self-damage
-* 
+## `damageCountdown.type`: [Damage.Type](relevant-flags.md#damagetype) bitmask
+The type of damage which should be inflicted. The component defaults to `Damage.Type.SUICIDE`.
 
 
 # Component `damageIncrease` (AttackComponents)
-`nil` for most characters, except Tempo (`{damage=999}`)
+Increases damage dealt by the character.
+
+## `damageIncrease.damage`: int
+The amount to add to the damage.
+
+## `damageIncrease.type`: [Damage.Type](relevant-flags.md#damagetype)
+Which types should have an increase in damage.
 
 
 # Component `dwarfism`
-`{}` for most characters (`false` for NocturnaBat), but I should look into it...
+If present, the character can be dwarfed (i.e. by ooze). Also note `dwarfism.permanent`
 
-Also look into other Dwarfism-related components
+
+# Component `dwarfismDigStrengthOverride`
+
 
 
 # Component `forceObjectVision`
@@ -183,7 +188,7 @@ This is `{}` for most characters, but `false` for NocturnaBat.
 This is `{}` for most characters, but `false` for NocturnaBat.
 
 
-# Component `transformable`
+# Component `transformable` (CharacterComponents)
 This is `nil` for most characters, except:
 
 * Nocturna: `{targetType="NocturnaBat"}`
