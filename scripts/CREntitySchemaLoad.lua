@@ -1,5 +1,9 @@
+local Event   = require "necro.event.Event"
+local ItemBan = require "necro.game.item.ItemBan"
+
 local CRSettings = require "CharRules.CRSettings"
-local Event      = require "necro.event.Event"
+
+local CSILoaded, CSISettings = pcall(require, "ControlledStartingInventory.CSISettings")
 
 ------------
 -- TABLES --
@@ -19,7 +23,7 @@ Event.entitySchemaGenerate.add("charRulesFunctions", {order="components", sequen
   invCursedTable = CRSettings.getSet("inv.cursed")
 
   if invBansTable then for k, v in pairs(invBansTable) do
-    if v == true then invBansTable[k] = 4161537 end
+    if v == true then invBansTable[k] = ItemBan.Flag.GENERATE_ITEM_POOL + ItemBan.Flag.GENERATE_LEVEL + ItemBan.Flag.GENERATE_TRANSACTION end
   end end
 end)
 
@@ -59,7 +63,7 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
   --#endregion
   --#region INVENTORY SETTINGS --
 
-  if invStartTable then
+  if invStartTable and not CSILoaded then
     local initInv = entity.initialInventory or {}
     initInv.items = invStartTable
     entity.initialInventory = initInv
@@ -128,8 +132,93 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
 
   --#endregion
   --#region └─ GROOVE DROP --
-  
+
+  local dropActive = CRSettings.get("groove.drop.active")
+  local dropDamage = CRSettings.get("groove.drop.damage")
+
+  if dropActive ~= 0 or dropDamage ~= 0 then
+    local drop = entity.grooveChainInflictDamageOnDrop or {}
+
+    if dropActive == 1 then
+      drop.active = true
+    elseif dropActive == -1 then
+      drop.active = false
+    end
+
+    if dropDamage ~= 0 then drop.damage = dropDamage end
+
+    entity.grooveChainInflictDamageOnDrop = drop
+  end
+
   --#endregion
+  --#endregion
+  --#region GOLD SETTINGS --
+
+  local goldStart = CRSettings.get("gold.start")
+  local goldKill = CRSettings.get("gold.kill")
+  local goldMinimum = CRSettings.get("gold.minimum")
+  local goldFree = CRSettings.get("gold.free")
+
+  if goldStart >= 0 then
+    local gold = entity.goldCounter or {}
+    gold.amount = goldStart
+    entity.goldCounter = gold
+  end
+
+  if goldKill ~= 0 then
+    entity.goldHater = (goldKill == 1) and {}
+
+    local invBans = entity.inventoryBannedItems or {}
+    local invBansComp = invBans.components or {}
+    local currencyBan = invBansComp.itemCurrency or 0
+
+    if goldKill == 1 then currencyBan = bit.bor(currencyBan, ItemBan.Flag.PICKUP_DEATH)
+    else currencyBan = bit.band(currencyBan, bit.bnot(ItemBan.Flag.PICKUP_DEATH)) end
+
+    if currencyBan == 0 then currencyBan = nil end
+    invBansComp.itemCurrency = currencyBan
+    invBans.components = invBansComp
+    entity.inventoryBannedItems = invBans
+  end
+
+  if goldMinimum >= 0 then
+    local min = entity.minimumCurrencyDrop or {}
+    min.minimum = goldMinimum
+    entity.minimumCurrencyDrop = min
+  end
+
+  if goldFree == -1 then
+    entity.shoplifter = false
+  elseif goldFree == 1 then
+    entity.shoplifter = {}
+  end
+
+  --#endregion
+  --#region COUNTDOWN SETTINGS --
+
+  local countdownActive = CRSettings.get("countdown.active")
+  local countdownDamage = CRSettings.get("countdown.damage")
+  local countdownTimer = CRSettings.get("countdown.timer")
+
+  if countdownActive == 1 then
+    local countdown = entity.damageCountdown or {}
+
+    if countdownDamage ~= 0 then countdown.damage = countdownDamage end
+    if countdownTimer ~= 0 then countdown.countdownReset = countdownTimer end
+
+    entity.damageCountdown = countdown
+
+    -- defining it like this to not override other-mod flyaway texts
+    local countdownFlyaways = entity.damageCountdownFlyaways or {}
+    local countdownTexts = countdownFlyaways.texts or {}
+    for i = 0, 5 do countdownTexts[i+1] = tostring(i) end
+    for i = 10, 50, 10 do countdownTexts[i+1] = tostring(i) end
+    countdownFlyaways.texts = countdownTexts
+    entity.damageCountdownFlyaways = countdownFlyaways
+  elseif countdownActive == -1 then
+    entity.damageCountdown = false
+  end
+
   --#endregion
 end)
 

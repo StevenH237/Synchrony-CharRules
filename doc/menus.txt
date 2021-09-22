@@ -22,10 +22,12 @@ Main menu
 │     ├─ Damage dealt: (int, 1 is default)
 │     └─ Damage type: (damage type, SELF_DAMAGE is default)
 ├─ Currency options
-│  ├─ Starting gold: (int, 0 is default)
+│  ├─ Starting gold: (int, -1 for default)
 │  ├─ Die on gold pickup: (default/no/yes)
-│  ├─ Minimum currency drop: (int, 0 is default)
+│  ├─ Minimum currency drop: (int, -1 for default)
 │  └─ Free items from shops: (default/no/yes)
+├─ Damage countdown options
+│  ├─ Active: 
 ├─ Action options
 │  ├─ Use options: (yes/no)
 │  ├─ Presets

@@ -4,6 +4,8 @@ local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
 
 local NixLib = require "NixLib.NixLib"
+
+local CSILoaded, CSISettings = pcall(require, "ControlledStartingInventory.CSISettings")
 --#endregion Imports
 
 ----------------
@@ -12,10 +14,15 @@ local NixLib = require "NixLib.NixLib"
 
 --NOTE: THIS RETURNS A FUNCTION, CALL IT IN YOUR SETTINGS DEF WITH THE DEFAULT VALUE
 --For example, "numberFormat(0)" returns a format function that says "(Default)" for zero.
-local function numberFormat(def)
+local function numberFormat(def, off, dis)
+  off = off or 0
+  dis = dis or nil
+
   return function(val)
-    if val == def then return "(Default)"
-    else return tostring(val) end
+    if val == def then return "(Default)" end
+    if val == dis then return "(Disabled)" end
+    val = val + off
+    return tostring(val)
   end
 end
 
@@ -35,6 +42,11 @@ local function listFormat(str)
 
   local item = table.remove(list)
   return table.concat(list, ", ") .. ", & " .. item
+end
+
+local function itemsFormat(str)
+  if CSILoaded then return "(Disabled by CSI)" end
+  return listFormat(str)
 end
 
 local function dictFormat(str)
@@ -160,7 +172,8 @@ InvStart = Settings.entitySchema.string {
   id="inv.start",
   order=1,
   default="",
-  format=listFormat
+  format=itemsFormat,
+  enableIf=function() return not CSILoaded end
 }
 
 InvBans = Settings.entitySchema.string {
@@ -295,11 +308,105 @@ GrooveDropDamage = Settings.entitySchema.number {
   desc="How much damage dropping the multiplier should do.",
   id="groove.drop.damage",
   order=2,
-  minimum=0
+  minimum=0,
+  format=numberFormat(0),
+  editAsString=true
 }
 
 --#endregion
+--#region Gold options
+
+Gold = Settings.group {
+  name="Gold settings",
+  desc="Options that deal with gold",
+  id="gold",
+  order=5
+}
+
+GoldStart = Settings.entitySchema.number {
+  name="Starting gold",
+  desc="How much gold do characters start with?",
+  id="gold.start",
+  order=1,
+  minimum=-1,
+  default=-1,
+  format=numberFormat(-1),
+  editAsString=true
+}
+
+GoldKill = Settings.entitySchema.enum {
+  name="Gold kills on pickup",
+  desc="If enabled, gold kills the player when picked up.",
+  id="gold.kill",
+  order=2,
+  enum=enumTristate,
+  default=0,
+  format=tristateFormat
+}
+
+GoldMinimum = Settings.entitySchema.number {
+  name="Minimum gold drops",
+  desc="The lowest amount of gold that is killed by anything dropped.",
+  id="gold.minimum",
+  order=3,
+  minimum=-1,
+  default=-1,
+  format=numberFormat(-1),
+  editAsString=true
+}
+
+GoldFree = Settings.entitySchema.enum {
+  name="Free items from shops",
+  desc="If set, players can take one item from shops for free.",
+  id="gold.free",
+  order=4,
+  enum=enumTristate,
+  default=0,
+  format=tristateFormat
+}
+
 --#endregion Settings
+--#region Damage countdown options
+
+Countdown = Settings.group {
+  name="Damage countdown",
+  desc="Damage every x beats unless you kill or pick up items",
+  id="countdown"
+}
+
+GrooveDropActive = Settings.entitySchema.enum {
+  name="Active",
+  desc="Whether or not the countdown timer is active",
+  id="countdown.active",
+  order=1,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+CountdownDamage = Settings.entitySchema.number {
+  name="Damage amount",
+  desc="How much damage the damage multiplier should do.",
+  id="countdown.damage",
+  order=2,
+  minimum=0,
+  default=0,
+  format=numberFormat(0),
+  editAsString=true
+}
+
+CountdownTimer = Settings.entitySchema.number {
+  name="Countdown time",
+  desc="How many beats should be in the countdown timer.",
+  id="countdown.timer",
+  order=3,
+  minimum=0,
+  default=0,
+  format=numberFormat(0, -1),
+  editAsString=true
+}
+
+--#endregion
 
 ------------------
 -- RETURN TABLE --
