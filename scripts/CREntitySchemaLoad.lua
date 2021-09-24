@@ -60,6 +60,41 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
     entity.healthLimit = cmpLimit
   end
 
+  --#region └─ INVINCIBILITY SETTINGS --
+
+  local invEnable = CRSettings.get("health.invincibility.general")
+  local invOnHit = CRSettings.get("health.invincibility.onHit")
+  local invOnStart = CRSettings.get("health.invincibility.onLevelStart")
+
+  if invEnable == -1 then
+    entity.invincibility = false
+    entity.invincibilityOnHit = false
+    entity.invincibilityOnLevelStart = false
+  else
+    if invEnable > 0 then
+      local inv = entity.invincibility or {}
+      if invEnable == 2 then inv.permanent = true end
+      entity.invincibility = inv
+    end
+
+    if invOnHit == 0 then
+      entity.invincibilityOnHit = false
+    elseif invOnHit > 0 then
+      local invHit = entity.invincibilityOnHit or {}
+      invHit.turns = invOnHit
+      entity.invincibilityOnHit = invHit
+    end
+
+    if invOnStart == 0 then
+      entity.invincibilityOnLevelStart = false
+    elseif invOnStart > 0 then
+      local invStart = entity.invincibilityOnLevelStart or {}
+      invStart.turns = invOnStart
+      entity.invincibilityOnLevelStart = invStart
+    end
+  end
+
+  --#endregion
   --#endregion
   --#region INVENTORY SETTINGS --
 

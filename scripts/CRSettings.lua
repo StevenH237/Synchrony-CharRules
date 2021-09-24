@@ -1,5 +1,6 @@
 --#region Imports
 local Enum            = require "system.utils.Enum"
+local Menu            = require "necro.menu.Menu"
 local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
 
@@ -64,10 +65,23 @@ local function dictFormat(str)
   return out:sub(3)
 end
 
+local function invinNumberFormat(def, off, dis)
+  if SettingsStorage.get("mod.CharRules.health.invincibility.general", Settings.Layer.REMOTE_PENDING) == 2 then return "(Permanent)" end
+  return numberFormat(def, off, dis)
+end
+
 local function tristateFormat(val)
   if val == -1 then return "No"
   elseif val == 0 then return "(Default)"
   elseif val == 1 then return "Yes"
+  else return "" end
+end
+
+local function quadstateFormat(val)
+  if val == -1 then return "No"
+  elseif val == 0 then return "(Default)"
+  elseif val == 1 then return "Yes"
+  elseif val == 2 then return "Permanent"
   else return "" end
 end
 
@@ -77,6 +91,18 @@ local function songEndFormat(val)
   elseif val == 2 then return "Proceed to next floor"
   elseif val == 3 then return "Loop song"
   else return "" end
+end
+
+--#endregion
+
+--------------
+-- ENABLERS --
+--#region-----
+
+local function startingInventoryEnabler() return not CSILoaded end
+
+local function invincibilityEnabler()
+  return not SettingsStorage.get("mod.CharRules.health.invincibility.general", Settings.Layer.REMOTE_PENDING) == 2
 end
 
 --#endregion
@@ -91,6 +117,13 @@ local enumTristate = Enum.sequence {
   YES=1
 }
 
+local enumQuadstate = Enum.sequence {
+  NO=-1,
+  DEFAULT=0,
+  YES=1,
+  PERMANENT=2
+}
+
 local enumSongEnd = Enum.sequence {
   DEFAULT=0,
   DEATH=1,
@@ -98,6 +131,19 @@ local enumSongEnd = Enum.sequence {
 }
 
 --#endregion Enums
+
+-------------
+-- ACTIONS --
+--#region----
+
+local function actionReset()
+  local keys = SettingsStorage.listKeys("mod.CharRules.")
+  for _, key in ipairs(keys) do
+    SettingsStorage.set(key, nil, Settings.Layer.REMOTE_PENDING)
+  end
+end
+
+--#endregion
 
 --------------
 -- SETTINGS --
@@ -156,11 +202,49 @@ HealthLimit = Settings.entitySchema.number {
   editAsString=true
 }
 
+HealthInvincibility = Settings.group {
+  name="Invincibility options",
+  desc="Options about invincibility.",
+  id="health.invincibility",
+  order=5
+}
+
+HealthInvincibilityGeneral = Settings.entitySchema.enum {
+  name="Enabled",
+  desc="Whether invincibility is enabled during gameplay.",
+  id="health.invincibility.general",
+  order=1,
+  enum=enumQuadstate,
+  format=quadstateFormat,
+  default=0
+}
+
+HealthInvincibilityOnHit = Settings.entitySchema.number {
+  name="On hit",
+  desc="How many beats you're invincible after being hit.",
+  id="health.invincibility.onHit",
+  order=2,
+  default=-1,
+  minimum=-1,
+  format=numberFormat(-1, 0, 0),
+  editAsString=true
+}
+
+HealthInvincibilityOnLevelStart = Settings.entitySchema.number {
+  name="On level start",
+  desc="How many beats you're invincible after the level starts.",
+  id="health.invincibility.onLevelStart",
+  order=3,
+  default=-1,
+  minimum=-1,
+  format=numberFormat(-1, 0, 0)
+}
+
 --#endregion health settings
 --#region Inventory settings
 
 Inv = Settings.group {
-  name="Inventory settings",
+  name="Inventory options",
   desc="Settings that affect the inventory",
   id="inv",
   order=2
@@ -173,7 +257,7 @@ InvStart = Settings.entitySchema.string {
   order=1,
   default="",
   format=itemsFormat,
-  enableIf=function() return not CSILoaded end
+  enableIf=startingInventoryEnabler
 }
 
 InvBans = Settings.entitySchema.string {
@@ -371,10 +455,11 @@ GoldFree = Settings.entitySchema.enum {
 Countdown = Settings.group {
   name="Damage countdown",
   desc="Damage every x beats unless you kill or pick up items",
-  id="countdown"
+  id="countdown",
+  order=6
 }
 
-GrooveDropActive = Settings.entitySchema.enum {
+CountdownActive = Settings.entitySchema.enum {
   name="Active",
   desc="Whether or not the countdown timer is active",
   id="countdown.active",
@@ -402,11 +487,19 @@ CountdownTimer = Settings.entitySchema.number {
   order=3,
   minimum=0,
   default=0,
-  format=numberFormat(0, -1),
+  format=numberFormat(0),
   editAsString=true
 }
 
 --#endregion
+
+ResetButton = Settings.entitySchema.action {
+  name="Reset mod settings",
+  desc="Resets ALL mod settings to defaults",
+  id="reset",
+  order=9999,
+  action=actionReset
+}
 
 ------------------
 -- RETURN TABLE --
