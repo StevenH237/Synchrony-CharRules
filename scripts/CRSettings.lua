@@ -492,6 +492,26 @@ CountdownTimer = Settings.entitySchema.number {
 }
 
 --#endregion
+--#region Offense settings
+
+Damage = Settings.group {
+  name="Damage options",
+  desc="Options affecting damage dealt",
+  id="damage",
+  order=7
+}
+
+DamageIncrease = Settings.group {
+  name="Damage increase",
+  desc="Increases damage dealt",
+  id="damage.increase",
+  order=1,
+  minimum=-1,
+  default=-1,
+  format=numberFormat(-1, 0, -1)
+}
+
+--#endregion
 
 ResetButton = Settings.entitySchema.action {
   name="Reset mod settings",

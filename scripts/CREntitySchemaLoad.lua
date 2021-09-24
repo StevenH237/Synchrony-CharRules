@@ -206,9 +206,15 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
     local invBans = entity.inventoryBannedItems or {}
     local invBansComp = invBans.components or {}
     local currencyBan = invBansComp.itemCurrency or 0
+    local goldRingBan = invBansComp.itemAutoCollectCurrencyOnMove or 0
 
-    if goldKill == 1 then currencyBan = bit.bor(currencyBan, ItemBan.Flag.PICKUP_DEATH)
-    else currencyBan = bit.band(currencyBan, bit.bnot(ItemBan.Flag.PICKUP_DEATH)) end
+    if goldKill == 1 then
+      currencyBan = bit.bor(currencyBan, ItemBan.Flag.PICKUP_DEATH)
+      goldRingBan = bit.bor(goldRingBan, ItemBan.Flag.GENERATE_ITEM_POOL + ItemBan.Flag.GENERATE_LEVEL + ItemBan.Flag.GENERATE_TRANSACTION)
+    else
+      currencyBan = bit.band(currencyBan, bit.bnot(ItemBan.Flag.PICKUP_DEATH))
+      goldRingBan = bit.band(goldRingBan, bit.bnot(ItemBan.Flag.GENERATE_ITEM_POOL + ItemBan.Flag.GENERATE_LEVEL + ItemBan.Flag.GENERATE_TRANSACTION))
+    end
 
     if currencyBan == 0 then currencyBan = nil end
     invBansComp.itemCurrency = currencyBan
@@ -252,6 +258,19 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
     entity.damageCountdownFlyaways = countdownFlyaways
   elseif countdownActive == -1 then
     entity.damageCountdown = false
+  end
+
+  --#endregion
+  --#region DAMAGE SETTINGS --
+
+  local damageIncrease = CRSettings.get("damage.increase")
+
+  if damageIncrease == 0 then
+    entity.damageIncrease = false
+  else
+    local inc = entity.damageIncrease or {}
+    inc.damageIncrease = damageIncrease
+    entity.damageIncrease = inc
   end
 
   --#endregion
