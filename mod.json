@@ -6,7 +6,7 @@
 	"description": "Modifies gameplay rules using options for individual characters' rules.",
 	"author": "Nixill",
 	"dependencies": {
-		"NixLib": "1.1.0"
+		"NixLib": "1.1.1"
 	},
 	"api": {
 		"scriptPath": "scripts"

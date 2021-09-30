@@ -1,7 +1,10 @@
-local Event   = require "necro.event.Event"
-local ItemBan = require "necro.game.item.ItemBan"
+local Action    = require "necro.game.system.Action"
+local Event     = require "necro.event.Event"
+local ItemBan   = require "necro.game.item.ItemBan"
+local LevelExit = require "necro.game.tile.LevelExit"
 
-local CRSettings = require "CharRules.CRSettings"
+local CRSettings          = require "CharRules.CRSettings"
+local CRInventoryModifier = require "CharRules.CRInventoryModifier"
 
 local CSILoaded, CSISettings = pcall(require, "ControlledStartingInventory.CSISettings")
 
@@ -9,7 +12,11 @@ local CSILoaded, CSISettings = pcall(require, "ControlledStartingInventory.CSISe
 -- TABLES --
 --#region---
 
-local invStartTable, invBansTable, invCursedTable
+local invStartMode,  invStartAdd,  invStartRemove,
+       invBansMode,   invBansAdd,   invBansRemove,
+     invCursedMode, invCursedAdd, invCursedRemove
+local visibleComponents, monocleMode,
+      telepathyMode, trapsightMode
 
 --#endregion
 
@@ -18,17 +25,66 @@ local invStartTable, invBansTable, invCursedTable
 --#region---
 
 Event.entitySchemaGenerate.add("charRulesFunctions", {order="components", sequence=-1}, function ()
-  invStartTable = CRSettings.getList("inv.start")
-  invBansTable = CRSettings.getSet("inv.bans")
-  invCursedTable = CRSettings.getSet("inv.cursed")
+  invStartMode, invStartAdd, invStartRemove = CRInventoryModifier.inventoryList(CRSettings.get("inv.start"))
+  invBansMode, invBansAdd, invBansRemove = CRInventoryModifier.inventoryList(CRSettings.get("inv.bans"))
+  invCursedMode, invCursedAdd, invCursedRemove = CRInventoryModifier.inventoryList(CRSettings.get("inv.cursed"))
 
-  if invBansTable then for k, v in pairs(invBansTable) do
-    if v == true then invBansTable[k] = ItemBan.Flag.GENERATE_ITEM_POOL + ItemBan.Flag.GENERATE_LEVEL + ItemBan.Flag.GENERATE_TRANSACTION end
-  end end
+  local bansAddSet
+  local bansRemoveSet
+
+  if invBansAdd then
+    bansAddSet = {}
+    for i, v in ipairs(invBansAdd) do
+      local k, v2 = string.match(v, "^([^:]+):(.+)$")
+      if k then bansAddSet[k] = tonumber(v2)
+      else bansAddSet[v] = ItemBan.Flag.GENERATE_ITEM_POOL + ItemBan.Flag.GENERATE_LEVEL + ItemBan.Flag.GENERATE_TRANSACTION + ItemBan.Flag.GENERATE_SHRINE_POOL + ItemBan.Flag.PICKUP end
+    end
+  end
+
+  if invBansRemove then
+    bansRemoveSet = {}
+    for i, v in ipairs(invBansRemove) do
+      local k, v2 = string.match(v, "^([^:]+):(.+)$")
+      if k then bansAddSet[k] = tonumber(v2)
+      else bansAddSet[v] = bit.bnot(0) end
+    end
+  end
+
+  invBansAdd = bansAddSet
+  invBansRemove = bansRemoveSet
+
+  -- The components people have selected to make visible
+  visibleComponents = CRSettings.getList("misc.vision.component.custom")
+  monocleMode = CRSettings.get("misc.vision.component.monocle")
+  telepathyMode = CRSettings.get("misc.vision.component.telepathy")
+  trapsightMode = CRSettings.get("misc.vision.component.trapsight")
 end)
 
 Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, function(ev)
   local entity = ev.entity
+
+  --#region NOT SETTINGS --
+  -- These things aren't settings, they're component adds to make other settings work better
+  if entity.visibleByMonocle and monocleMode then
+    entity.CharRules_visibleCustom = {}
+  end
+
+  if entity.visibleByTelepathy and telepathyMode then
+    entity.CharRules_visibleCustom = {}
+  end
+
+  if entity.trap and trapsightMode then
+    entity.CharRules_visibleCustom = {}
+  end
+
+  if visibleComponents ~= nil then    
+    for i, v in ipairs(visibleComponents) do
+      if entity[v] then
+        entity.CharRules_visibleCustom = {}
+      end
+    end
+  end
+  --#endregion
 
   if not entity.playableCharacter then return end
 
@@ -98,21 +154,83 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
   --#endregion
   --#region INVENTORY SETTINGS --
 
-  if invStartTable and not CSILoaded then
+  if invStartMode then
     local initInv = entity.initialInventory or {}
-    initInv.items = invStartTable
+    if invStartMode == "replace" then initInv.items = invStartAdd
+    else
+      local newList = {}
+
+      -- Remove stuff from the removed list
+      for i, v in ipairs(initInv.items) do
+        for i2, v2 in ipairs(invStartRemove) do
+          if v2:sub(-1) == "*" then
+            -- If it ends in asterisk, treat it as a prefix
+            if v:sub(1, v2:len()-1) == v2:sub(1, -2) then goto invStartContinue end
+          else
+            -- Otherwise treat it as an exact ID
+            if v == v2 then goto invStartContinue end
+          end
+        end
+
+        table.insert(newList, v)
+
+        ::invStartContinue::
+      end
+
+      for i, v in ipairs(invStartAdd) do
+        -- Add stuff from the additions list
+        table.insert(newList, v)
+      end
+
+      initInv.items = newList
+    end
     entity.initialInventory = initInv
   end
 
-  if invBansTable then
+  if invBansMode then
     local bans = entity.inventoryBannedItems or {}
-    bans.components = invBansTable
+    
+    if invBansMode == "replace" then bans.components = invBansAdd
+    else
+      bans.components = bans.components or {}
+
+      -- Remove stuff from the removed list
+      for k, v in pairs(bans.components) do
+        if invBansRemove[k] then
+          bans.components[k] = bit.band(bans.components[k], bit.bnot(invBansRemove[k]))
+        end
+      end
+
+      -- Add stuff from the added list
+      for k, v in pairs(invBansAdd) do
+        if bans.components[k] then
+          bans.components[k] = bit.bor(bans.components[k], v)
+        else
+          bans.components[k] = v
+        end
+      end
+    end
+
     entity.inventoryBannedItems = bans
   end
 
-  if invCursedTable then
+  if invCursedMode then
     local curses = entity.inventoryCursedSlots or {}
-    curses.slots = invCursedTable
+    
+    if invCursedMode == "replace" then curses.slots = invCursedAdd
+    else
+      curses.slots = curses.slots or {}
+
+      -- Remove stuff from the removed list
+      for i, v in ipairs(invCursedRemove) do
+        curses.slots[v] = false
+      end
+
+      for i, v in ipairs(invCursedAdd) do
+        curses.slots[v] = true
+      end
+    end
+
     entity.inventoryCursedSlots = curses
   end
 
@@ -218,6 +336,7 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
 
     if currencyBan == 0 then currencyBan = nil end
     invBansComp.itemCurrency = currencyBan
+    invBansComp.itemAutoCollectCurrencyOnMove = goldRingBan
     invBans.components = invBansComp
     entity.inventoryBannedItems = invBans
   end
@@ -267,12 +386,122 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
 
   if damageIncrease == 0 then
     entity.damageIncrease = false
-  else
+  elseif damageIncrease > 1 then
     local inc = entity.damageIncrease or {}
-    inc.damageIncrease = damageIncrease
+    inc.damage = damageIncrease
     entity.damageIncrease = inc
   end
 
+  --#endregion
+  --#region ALLOWED ACTIONS --
+
+  do
+    local dirs = CRSettings.getAllowedActions()
+    local filter = entity.actionFilter or {}
+    local ignored = filter.ignoreActions or {
+      [Action.Direction.UP_RIGHT]=true,
+      [Action.Direction.UP_LEFT]=true,
+      [Action.Direction.DOWN_LEFT]=true,
+      [Action.Direction.DOWN_RIGHT]=true
+    }
+
+    for i = 1, 14 do
+      if dirs[i] == -1 then
+        ignored[i] = true
+      elseif dirs[i] == 1 then
+        ignored[i] = false
+      end
+    end
+
+    filter.ignoreActions = ignored
+    entity.actionFilter = filter
+  end
+
+  --#endregion
+  --#region MISC SETTINGS --
+  --#region Exit settings
+
+  do
+    local miniboss = CRSettings.get("misc.exits.miniboss")
+    local sarcophagus = CRSettings.get("misc.exits.sarcophagus")
+
+    local exitStairLock = entity.bypassStairLock or {level=0}
+    local exitLevel = exitStairLock.level or 2
+
+    if miniboss == -1 then
+      exitLevel = bit.bor(exitLevel, LevelExit.StairLock.MINIBOSS)
+    elseif miniboss == 1 then
+      exitLevel = bit.band(exitLevel, bit.bnot(LevelExit.StairLock.MINIBOSS))
+    end
+
+    if sarcophagus == -1 then
+      exitLevel = bit.bor(exitLevel, LevelExit.StairLock.SARCOPHAGUS)
+    elseif sarcophagus == 1 then
+      exitLevel = bit.band(exitLevel, bit.bnot(LevelExit.StairLock.SARCOPHAGUS))
+    end
+
+    exitStairLock.level = exitLevel
+    entity.bypassStairLock = exitStairLock
+  end
+
+  --#endregion
+  
+  do
+    local untoggled = CRSettings.get("misc.untoggled")
+
+    if untoggled == -1 then
+      entity.takeDamageOnUntoggledMovement = false
+    elseif untoggled == 1 then
+      entity.takeDamageOnUntoggledMovement = {}
+    end
+
+    local lamb = CRSettings.get("misc.lamb")
+
+    if lamb == -1 then
+      entity.characterWithFollower = false
+    elseif lamb == 1 then
+      entity.characterWithFollower = {followerType="Marv"}
+    end
+  end
+
+  --#region Vision settings
+
+  do
+    local visionAll = CRSettings.get("misc.vision.all")
+
+    if visionAll == -1 then
+      entity.forceAllTileVision = false
+    elseif visionAll == 1 then
+      entity.forceAllTileVision = {}
+    end
+
+    local useComponents = CRSettings.get("misc.vision.component.use")
+
+    if useComponents then
+      entity.forceObjectVision = {component="CharRules_visibleCustom"}
+      entity.minimapVision = {component="CharRules_visibleCustom"}
+      entity.forceNonSilhouetteVision = {component="CharRules_visibleCustom"}
+    end
+
+    local objectLimit = CRSettings.get("misc.vision.objectLimit")
+
+    if objectLimit > 0 then
+      local limiter = entity.limitObjectVisionRadius or {}
+      limiter.radius = objectLimit
+      entity.limitObjectVisionRadius = limiter
+    end
+
+    local tileLimit = CRSettings.get("misc.vision.tileLimit")
+
+    if tileLimit > 0 then
+      local limiter = entity.limitTileVisionRadius or {}
+      limiter.radius = tileLimit
+      entity.limitTileVisionRadius = limiter
+    end
+  end
+
+  --#endregion
+  
   --#endregion
 end)
 

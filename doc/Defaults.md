@@ -28,6 +28,22 @@ If a setting isn't listed under a particular character, it uses this default ins
 * Damage countdown **Active**: No
 * Damage countdown **Damage amount**: 0
 * Damage countdown **Countdown time**: 0
+* **Damage increase**: 0
+* Allowed actions, movement **North**/**East**/**South**/**West**: Yes
+* Allowed actions, movement **Northeast**/**Southeast**/**Southwest**/**Northwest**: No
+* Allowed actions, **Item 1**/**Bomb**: Yes
+* Allowed actions, **Item 2**/**Throw**/**Spell 1**/**Spell 2**: Yes
+* Level exit **Require miniboss**: Yes
+* Level exit **Require sarcophagus**: Yes
+* **Damage on untoggled movement**: No
+* **Lamb follower**: No
+* **All tile vision**: No
+* **Monocle sight**: Off
+* **Telepathy sight**: Off
+* **Trapsight**: Off
+* **Other components**: " "
+* **Limit object vision range**: Off
+* **Limit tile vision range**: Off
 
 # Cadence
 * **Starting health**: 6
@@ -49,6 +65,7 @@ If a setting isn't listed under a particular character, it uses this default ins
 * **Starting inventory**: Bomb WeaponDagger ShovelBasic CharmNazar MiscPotion
 * **Banned components**: itemArmorGrooveChain:131072 itemBanAria:2916352 itemBanHealthlocked:2916352 itemBanWeaponlocked:4161537 itemGrooveChainImmunity:4161537
 * Drop damage penalty **Active**: Yes
+* Level exit **Require sarcophagus**: No
 
 # Dorian
 * **Starting health**: 8
@@ -56,6 +73,7 @@ If a setting isn't listed under a particular character, it uses this default ins
 * **Starting inventory**: Bomb WeaponDagger Pickaxe FeetBootsLeaping ArmorPlatemailDorian MiscCompass RingMight
 * **Banned components**: itemBanDorian:2916352
 * **Cursed slots**: body feet
+* **Damage on untoggled movement**: Yes
 
 # Eli
 * **Starting health**: 6
@@ -82,6 +100,7 @@ If a setting isn't listed under a particular character, it uses this default ins
 * **Cursed slots**: weapon
 * **On song end**: Kill player
 * **Free items from shops**: Yes
+* Level exit **Require miniboss**: No
 
 # Coda
 * **Starting health**: 1
@@ -94,6 +113,7 @@ If a setting isn't listed under a particular character, it uses this default ins
 * **Gold kills on pickup**: Yes
 * **Minimum gold drops**: 1
 * **Free items from shops**: Yes
+* Level exit **Require sarcophagus**: No
 
 # Bolt
 * **Starting health**: 6
@@ -121,14 +141,15 @@ If a setting isn't listed under a particular character, it uses this default ins
 * **Starting inventory**: Bomb WeaponDagger ShovelBasic Torch1
 * **Banned components**: itemBanDiamond:2916352
 * **Cursed slots**: hud spell
-*note*: Diamond's ability to move diagonally is not yet implemented in this mod.
+* Allowed actions, movement **Northeast**/**Southeast**/**Southwest**/**Northwest**: Yes
+* Allowed actions, **Item 2**/**Throw**/**Spell 1**/**Spell 2**: No
 
 # Mary
 * **Starting health**: 6
 * **Starting max health**: 6
 * **Starting inventory**: Bomb WeaponSpear ShovelBasic Torch1 FoodCookies CharmNazar
 * **Banned components**: itemBanMary:2916352
-*note*: Mary's follower lamb is not yet implemented in this mod.
+* **Lamb follower**: No
 
 # Tempo
 * **Starting health**: 6
@@ -138,3 +159,5 @@ If a setting isn't listed under a particular character, it uses this default ins
 * Damage countdown **Active**: Yes
 * Damage countdown **Damage amount**: 999
 * Damage countdown **Countdown time**: 17
+* **Damage increase**: 999
+* **Telepathy sight**: On

@@ -36,13 +36,7 @@ end
 local function listFormat(str)
   if str == "" then return "(Default)" end
   if str == " " then return "(Empty)" end
-
-  local list = NixLib.splitToList(str)
-  if #list == 1 then return list[1] end
-  if #list == 2 then return list[1] .. " & " .. list[2] end
-
-  local item = table.remove(list)
-  return table.concat(list, ", ") .. ", & " .. item
+  return str
 end
 
 local function itemsFormat(str)
@@ -53,21 +47,7 @@ end
 local function dictFormat(str)
   if str == "" then return "(Default)" end
   if str == " " then return "(Empty)" end
-
-  local dict = NixLib.splitToSet(str)
-  local out = ""
-
-  for k, v in pairs(dict) do
-    if v == true then out = out .. ", " .. k
-    else out = out .. ", " .. k .. ": " .. v end
-  end
-
-  return out:sub(3)
-end
-
-local function invinNumberFormat(def, off, dis)
-  if SettingsStorage.get("mod.CharRules.health.invincibility.general", Settings.Layer.REMOTE_PENDING) == 2 then return "(Permanent)" end
-  return numberFormat(def, off, dis)
+  return str
 end
 
 local function tristateFormat(val)
@@ -137,7 +117,8 @@ local enumSongEnd = Enum.sequence {
 --#region----
 
 local function actionReset()
-  local keys = SettingsStorage.listKeys("mod.CharRules.")
+  print(Settings.Visibility)
+  local keys = SettingsStorage.listKeys("mod.CharRules", Settings.Layer.REMOTE_OVERRIDE)
   for _, key in ipairs(keys) do
     SettingsStorage.set(key, nil, Settings.Layer.REMOTE_PENDING)
   end
@@ -501,16 +482,333 @@ Damage = Settings.group {
   order=7
 }
 
-DamageIncrease = Settings.group {
+DamageIncrease = Settings.entitySchema.number {
   name="Damage increase",
   desc="Increases damage dealt",
   id="damage.increase",
   order=1,
   minimum=-1,
   default=-1,
-  format=numberFormat(-1, 0, -1)
+  format=numberFormat(-1, 0, -1),
+  editAsString=true
 }
 
+--#endregion
+--#region Allowed actions
+
+Allowed = Settings.group {
+  name="Allowed actions",
+  desc="Which actions are allowed or not within gameplay",
+  id="allowed",
+  order=8
+}
+
+--#region Allowed directions
+
+AllowedDirections = Settings.group {
+  name="Movement directions",
+  desc="Which movement directions are allowed or not within gameplay",
+  id="allowed.directions",
+  order=1
+}
+
+AllowedDirectionsNorth = Settings.entitySchema.enum {
+  name="North",
+  desc="Movement to the north (up), including attacking",
+  id="allowed.directions.north",
+  order=1,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+AllowedDirectionsEast = Settings.entitySchema.enum {
+  name="East",
+  desc="Movement to the east (right), including attacking",
+  id="allowed.directions.east",
+  order=2,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+AllowedDirectionsSouth = Settings.entitySchema.enum {
+  name="South",
+  desc="Movement to the south (down), including attacking",
+  id="allowed.directions.south",
+  order=3,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+AllowedDirectionsWest = Settings.entitySchema.enum {
+  name="West",
+  desc="Movement to the west (left), including attacking",
+  id="allowed.directions.west",
+  order=4,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+AllowedDirectionsNortheast = Settings.entitySchema.enum {
+  name="Northeast",
+  desc="Movement to the northeast (up-right), including attacking",
+  id="allowed.directions.northeast",
+  order=5,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+AllowedDirectionsSoutheast = Settings.entitySchema.enum {
+  name="Southeast",
+  desc="Movement to the southeast (down-right), including attacking",
+  id="allowed.directions.southeast",
+  order=6,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+AllowedDirectionsSouthwest = Settings.entitySchema.enum {
+  name="Southwest",
+  desc="Movement to the southwest (down-left), including attacking",
+  id="allowed.directions.southwest",
+  order=7,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+AllowedDirectionsNorthwest = Settings.entitySchema.enum {
+  name="Northwest",
+  desc="Movement to the northwest (up-left), including attacking",
+  id="allowed.directions.northwest",
+  order=8,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+--#endregion
+
+AllowedItem1 = Settings.entitySchema.enum {
+  name="Item 1",
+  desc="The use of the main item",
+  id="allowed.item1",
+  order=2,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+AllowedItem2 = Settings.entitySchema.enum {
+  name="Item 2 / Switch",
+  desc="The use of the secondary item, or functions such as the holster's switch",
+  id="allowed.item2",
+  order=3,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+AllowedBomb = Settings.entitySchema.enum {
+  name="Bomb",
+  desc="The use of bombs",
+  id="allowed.bomb",
+  order=4,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+AllowedThrow = Settings.entitySchema.enum {
+  name="Throw / Toggle",
+  desc="The use of throwing weapons or toggling toggleable items",
+  id="allowed.throw",
+  order=5,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+AllowedSpell1 = Settings.entitySchema.enum {
+  name="Spell 1",
+  desc="The use of the first spell",
+  id="allowed.spell1",
+  order=6,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+AllowedSpell2 = Settings.entitySchema.enum {
+  name="Spell 2",
+  desc="The use of the second spell",
+  id="allowed.spell2",
+  order=7,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+--#endregion
+--#region Misc settings
+
+Misc = Settings.group {
+  name="Misc settings",
+  desc="Other settings I couldn't really categorize together",
+  id="misc",
+  order=9
+}
+
+--#region Exit settings
+
+MiscExit = Settings.group {
+  name="Level exit settings",
+  desc="Settings controlling exit unlocks",
+  id="misc.exits",
+  order=1
+}
+
+MiscExitMiniboss = Settings.entitySchema.enum {
+  name="Require miniboss",
+  desc="Whether the miniboss must be defeated before the exit stairs unlock",
+  id="misc.exits.miniboss",
+  order=1,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+MiscExitSarcophagus = Settings.entitySchema.enum {
+  name="Require sarcophagus",
+  desc="Whether the sarcophagus must be defeated before the exit stairs unlock",
+  id="misc.exits.sarcophagus",
+  order=2,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+--#endregion
+
+MiscUntoggled = Settings.entitySchema.enum {
+  name="Damage on untoggled movement",
+  desc="Whether to take damage when moving with an item toggled on",
+  id="misc.untoggled",
+  order=2,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+MiscLamb = Settings.entitySchema.enum {
+  name="Lamb follower",
+  desc="Mary's lamb follower that must be protected",
+  id="misc.lamb",
+  order=3,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+--#region Vision options
+
+MiscVision = Settings.group {
+  name="Vision options",
+  desc="Options affecting vision",
+  id="misc.vision",
+  order=4
+}
+
+MiscVisionAll = Settings.entitySchema.enum {
+  name="All tile vision",
+  desc="Grant map-like vision",
+  id="misc.vision.all",
+  order=1,
+  enum=enumTristate,
+  format=tristateFormat,
+  default=0
+}
+
+--#region Component-based vision
+
+MiscVisionComponent = Settings.group {
+  name="Component-based vision",
+  desc="Vision based on components",
+  id="misc.vision.component",
+  order=2
+}
+
+MiscVisionComponentUse = Settings.entitySchema.bool {
+  name="Use these settings",
+  desc="Whether or not to enable the settings on this page",
+  id="misc.vision.component.use",
+  order=1,
+  default=false
+}
+
+MiscVisionComponentMonocle = Settings.entitySchema.bool {
+  name="Monocle sight",
+  desc="See items that are visible by monocle",
+  id="misc.vision.component.monocle",
+  order=2,
+  default=false
+}
+
+MiscVisionComponentTelepathy = Settings.entitySchema.bool {
+  name="Telepathy sight",
+  desc="See enemies that are visible by telepathy",
+  id="misc.vision.component.telepathy",
+  order=3,
+  default=false
+}
+
+MiscVisionComponentTrapsight = Settings.entitySchema.bool {
+  name="Trapsight",
+  desc="See traps that are visible by trapsight",
+  id="misc.vision.component.trapsight",
+  order=4,
+  default=false
+}
+
+MiscVisionComponentCustom = Settings.entitySchema.string {
+  name="Other components",
+  desc="Define your own components to force vision on here",
+  id="misc.vision.component.custom",
+  order=5,
+  default="",
+  format=listFormat
+}
+
+--#endregion
+
+MiscVisionObjectLimit = Settings.entitySchema.number {
+  name="Limit object vision range",
+  desc="Limits your vision of objects to the given number of tiles",
+  id="misc.vision.objectLimit",
+  order=3,
+  minimum=0,
+  default=0,
+  step=0.5,
+  format=numberFormat(0)
+}
+
+MiscVisionTileLimit = Settings.entitySchema.number {
+  name="Limit tile vision range",
+  desc="Limits your vision to the given number of tiles",
+  id="misc.vision.tileLimit",
+  order=4,
+  minimum=0,
+  default=0,
+  step=0.5,
+  format=numberFormat(0)
+}
+
+--#endregion
 --#endregion
 
 ResetButton = Settings.entitySchema.action {
@@ -540,6 +838,24 @@ return {
     if str == "" then return nil end
     if str == " " then return {} end
     return NixLib.splitToSet(str)
+  end,
+  getAllowedActions = function()
+    return {
+      AllowedDirectionsEast,
+      AllowedDirectionsNortheast,
+      AllowedDirectionsNorth,
+      AllowedDirectionsNorthwest,
+      AllowedDirectionsWest,
+      AllowedDirectionsSouthwest,
+      AllowedDirectionsSouth,
+      AllowedDirectionsSoutheast,
+      AllowedItem1,
+      AllowedItem2,
+      AllowedBomb,
+      AllowedThrow,
+      AllowedSpell1,
+      AllowedSpell2
+    }
   end
 }
 

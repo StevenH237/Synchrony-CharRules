@@ -23,7 +23,9 @@ These settings change how invincibility works for the character. This invincibil
 * **On level start**: The character receives this many beats of invincibility when the level starts.
 
 # Inventory settings
-These settings change the items which players start with or may receive. Note that if any value is set, it *overrides* the character's default. All three of these fields are space-separated lists, or use just a single space to make it an empty list.
+These settings change the items which players start with or may receive. All three of these fields are space-separated lists, or use just a single space to make it an empty list.
+
+By default, the values you enter will *override* character default values. However, you can *add* values by starting the list with a `+` (by itself), and you can remove items by putting a `-` before the items you want to remove. Attempting to remove an item that's not in the default list does nothing, and attempting to both remove and add an item results in it being added.
 
 * **Starting inventory**: The items with which the character starts. Note that vanilla ND items have IDs in `PascalCase` rather than `snake_case` - for example, the basic dagger is `WeaponDagger` rather than `weapon_dagger`. For mod items, prefix the mod's name, underscore, the item's ID - and you may have to ask the mod's developer what that ID is.
 * **Banned components**: For advanced users, you may remove items with given components from the item pool here. Be careful — if you ban your weapon, you can't pick it up if it's thrown!
@@ -66,3 +68,49 @@ These settings deal with Tempo's Curse.
 * **Active**: Whether or not the damage countdown is active.
 * **Damage amount**: How much damage hitting 0 on the countdown causes. This need not be lethal damage, although it defaults to such.
 * **Countdown time**: How many beats you get between kills. Note that this number is *one higher* than the highest you'll ever see on the timer itself, for example Tempo's default is 17.
+
+# Damage options
+This setting just lets you deal more damage! :D
+
+* **Damage increase**: Increases the amount of damage dealt by the player.
+
+# Allowed actions
+These settings let you change which actions you're allowed to take.
+
+* **Item 1**: Your first item, used with `Q` under the default controls.
+* **Item 2 / Switch**: Your second item, used with `W` under the default controls. This is also the button for switching weapons with the Holster.
+* **Bomb**: Bombs, used with `A` under the default controls.
+* **Throw / Toggle**: `S` under the default controls, which can throw daggers and spears, reload guns and crossbows, and toggle boots.
+* **Spell 1**: The first spell, used with `E` under the default controls.
+* **Spell 2**: The second spell, used with `D` under the default controls.
+
+## Movement directions
+These settings let you change which directions you're allowed to move.
+
+# Misc settings
+These are just the rest of the settings.
+
+* **Damage on untoggled movement**: If the character is holding a toggleable item, they take half a heart of damage when that item is turned off.
+* **Lamb follower**: Adds Marv, Mary's lamb, for all characters.
+
+## Level exit settings
+These affect level exit bypasses:
+
+* **Require miniboss**: If yes, the miniboss must be defeated before the exit stairs are usable.
+* **Require sarcophagus**: If yes, on a floor with a sarcophagus, the sarcophagus must be removed before the exit stairs are usable.
+
+## Vision settings
+These affect what you can see:
+
+* **All tile vision**: When enabled, the player can see the full map.
+* **Limit object vision range**: When enabled, the player can only see entities (items, enemies, trips) within this range.
+* **Limit tile vision range**: When enabled, the player can only see tiles within this range. This does not imply the limited object vision above.
+
+### Component-based vision
+These settings affect what things you can see:
+
+* **Use these settings**: This must be "Yes" for the settings on this page to take effect.
+* **Monocle sight**: Are items visible, as if you're wearing a Monocle?
+* **Telepathy sight**: Are enemies visible, as if you're wearing a Crown of Telepathy?
+* **Trapsight**: Are traps visible, as if you're holding a Torch of Foresight?
+* **Other components**: If entered here, any entities with these components are visible from afar.
