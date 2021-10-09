@@ -1,7 +1,7 @@
 {
 	"name": "CharRules",
 	"displayName": "Char Rules",
-	"version": "1.1.0",
+	"version": "2.0.0",
 	"synchronyVersion": "0.40.1",
 	"description": "Modifies gameplay rules using options for individual characters' rules.",
 	"author": "Nixill",
