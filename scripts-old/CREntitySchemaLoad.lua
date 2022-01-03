@@ -445,7 +445,7 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
   end
 
   --#endregion
-  
+
   do
     local untoggled = CRSettings.get("misc.untoggled")
 
