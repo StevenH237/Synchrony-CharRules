@@ -117,7 +117,6 @@ local enumSongEnd = Enum.sequence {
 --#region----
 
 local function actionReset()
-  print(Settings.Visibility)
   local keys = SettingsStorage.listKeys("mod.CharRules", Settings.Layer.REMOTE_OVERRIDE)
   for _, key in ipairs(keys) do
     SettingsStorage.set(key, nil, Settings.Layer.REMOTE_PENDING)
