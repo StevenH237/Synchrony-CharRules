@@ -6,6 +6,7 @@ local SettingsStorage = require "necro.config.SettingsStorage"
 
 local CRSettings = require "CharRules.CRSettings"
 local CREnum     = require "CharRules.CREnum"
+local CRSchema   = require "CharRules.CROldEntitySchema"
 
 local CSILoaded = pcall(require, "ControlledStartingInventory.CSISettings")
 
@@ -15,7 +16,7 @@ local PowerSettings = require "PowerSettings.PowerSettings"
 -- EVENTS --
 --#region---
 
-Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, function(ev)
+Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides", sequence=2}, function(ev)
   if not ev.entity.playableCharacter then return end
 
   local entity = ev.entity
@@ -26,6 +27,7 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
   entity.bypassStairLock = entity.bypassStairLock or {level=0}
   entity.bypassStairLock.level = entity.bypassStairLock.level or LevelExit.StairLock.MINIBOSS
 
+  --#region Character-specific rules
   --#region Aria's rules
   if CRSettings.get("characters.missedBeat") == CREnum.Tristate.YES then
     entity.grooveChainInflictDamageOnDrop = entity.grooveChainInflictDamageOnDrop or {}
@@ -172,6 +174,9 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
     entity.damageCountdown.countdownReset = entity.damageCountdown.countdownReset or 17
     entity.damageCountdown.damage = entity.damageCountdown.damage or 999
     entity.damageCountdown.killerName = entity.damageCountdown.killerName or "Tempo's Curse"
+    entity.soundDamageCountdown = {
+      sounds = { "tempoTick4", "tempoTick3", "tempoTick2", "tempoTick1" }
+    }
     if CRSettings.get("characters.killTimerDamage") > 0 then
       entity.damageCountdown.damage = CRSettings.get("characters.killTimerDamage")
     end
@@ -181,6 +186,131 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
         [11] = "10"
       }
     }
+  end
+  --#endregion
+  --#endregion
+
+  --#region Inventory rules
+  local healthBoost = 0
+  
+  --#region Items
+  local inv = entity.initialInventory or {items={}}
+  local items = inv.items
+  local newItems = {}
+
+  --First, delete the old items if necessary
+  for i, v in ipairs(items) do
+    local slot = CRSchema.itemSlots[v]
+    if (slot == "body" or slot == "action" or slot == "feet" or slot == "head" or slot == "ring" or slot == "shovel" or slot == "torch" or slot == "weapon") then
+      local setting = CRSettings.get("inventory.items." .. slot)
+      if setting == "CharRules_DefaultItem" then
+        local boost = CRSchema.healthIncreasingItems[v] or 0
+        healthBoost = healthBoost + boost
+
+        newItems[#newItems+1] = v
+      end
+    end
+
+    if slot == "bomb" then
+      local setting = CRSettings.get("inventory.items.bombs")
+      if setting == -2 then
+        local boost = CRSchema.healthIncreasingItems[v] or 0
+        healthBoost = healthBoost + boost
+
+        newItems[#newItems+1] = v
+      end
+    end
+
+    if slot == "spell" then
+      local setting = CRSettings.get("inventory.items.spells.take")
+      if not setting then
+        local boost = CRSchema.healthIncreasingItems[v] or 0
+        healthBoost = healthBoost + boost
+
+        newItems[#newItems+1] = v
+      end
+    end
+
+    if slot == "misc" then
+      local setting = CRSettings.get("inventory.items.charms.take")
+      if not setting then
+        local boost = CRSchema.healthIncreasingItems[v] or 0
+        healthBoost = healthBoost + boost
+
+        newItems[#newItems+1] = v
+      end
+    end
+  end
+
+  --Now pull the new items into the inventory
+  for i, v in ipairs({"body", "action", "feet", "head", "ring", "shovel", "torch", "weapon", "hud"}) do
+    local setting = CRSettings.get("inventory.items." .. v)
+    if setting ~= "CharRules_DefaultItem" and setting ~= "CharRules_NoneItem" then
+      local boost = CRSchema.healthIncreasingItems[setting] or 0
+      healthBoost = healthBoost + boost
+
+      newItems[#newItems+1] = setting
+    end
+  end
+
+  local bombs = CRSettings.get("inventory.items.bombs")
+  if bombs == -1 then
+    newItems[#newItems+1] = "BombInfinity"
+  elseif bombs > 0 then
+    for i = 1, bombs do
+      newItems[#newItems+1] = "Bomb"
+    end
+  end
+
+  local spells = CRSettings.get("inventory.items.spells.give")
+  for i, v in ipairs(spells) do
+    local boost = CRSchema.healthIncreasingItems[v] or 0
+    healthBoost = healthBoost + boost
+
+    newItems[#newItems+1] = v
+  end
+
+  local charms = CRSettings.get("inventory.items.charms.give")
+  for i, v in ipairs(charms) do
+    local boost = CRSchema.healthIncreasingItems[v] or 0
+    healthBoost = healthBoost + boost
+
+    newItems[#newItems+1] = v
+  end
+
+  local other = CRSettings.get("inventory.items.other")
+  for i, v in ipairs(other) do
+    local boost = CRSchema.healthIncreasingItems[v] or 0
+    healthBoost = healthBoost + boost
+
+    newItems[#newItems+1] = v
+  end
+
+  inv.items = newItems
+  entity.initialInventory = inv
+  --#endregion
+  --#endregion
+
+  --#region Health rules
+  if CRSettings.get("advanced") then
+    if CRSettings.get("health.use") then
+      entity.health = {
+        health = CRSettings.get("health.hearts"),
+        maxHealth = CRSettings.get("health.containers") - healthBoost
+      }
+      entity.cursedHealth = {
+        health = CRSettings.get("health.cursed")
+      }
+      entity.healthLimit = {
+        limit = CRSettings.get("health.limit")
+      }
+    end
+  end
+  --#endregion
+
+  --#region Other
+  if CRSettings.get("other.mapGen") ~= 0 then
+    entity.playerCharacterLevelGenerationTraits = {mask = CRSettings.get("other.mapGen")}
   end
   --#endregion
 end)

@@ -1,5 +1,6 @@
 --#region Imports
 local Damage          = require "necro.game.system.Damage"
+local Entities        = require "system.game.Entities"
 local GameDLC         = require "necro.game.data.resource.GameDLC"
 local ItemBan         = require "necro.game.item.ItemBan"
 local Menu            = require "necro.menu.Menu"
@@ -14,6 +15,16 @@ local NixLib = require "NixLib.NixLib"
 
 local CSILoaded = pcall(require, "ControlledStartingInventory.CSISettings")
 --#endregion Imports
+
+---------------
+-- FUNCTIONS --
+--#region------
+
+local function get(setting)
+  return PowerSettings.get("mod.CharRules." .. setting)
+end
+
+--#endregion
 
 ----------------
 -- FORMATTERS --
@@ -39,7 +50,40 @@ local function healthFormat(amt)
   return amt .. " (" .. (amt / 2) .. " hearts)"
 end
 
---#endregion
+local function zeroableHealthFormat(amt)
+  if amt == 0 then return "(None)" end
+  if amt <= 2 then return amt .. " (" .. (amt / 2) .. " heart)" end
+  return amt .. " (" .. (amt / 2) .. " hearts)"
+end
+
+local function inventorySlotFormat(value)
+  local entity = Entities.getEntityPrototype(value)
+
+  if entity then
+    if entity.friendlyName then
+      if SettingsStorage.get("config.showAdvanced")
+        and value ~= "CharRules_NoneItem"
+        and value ~= "CharRules_DefaultItem" then
+        return entity.friendlyName.name .. " (" .. value .. ")"
+      else
+        return entity.friendlyName.name
+      end
+    else
+      return value
+    end
+  else
+    return "(No such entity: " .. value .. ")"
+  end
+end
+
+local function healthAmountFormat(value)
+  if value == -1 then return "(Default)"
+  elseif value == 0 then return "Half a heart"
+  elseif value == 1 then return "1 heart"
+  else return value .. " hearts" end
+end
+
+--#endregion Formatters
 
 --------------
 -- ENABLERS --
@@ -54,10 +98,40 @@ local function isAmplified()
 end
 
 local function isAdvancedAndAmplified()
-  return isAdvanced() or isAmplified()
+  return isAdvanced() and isAmplified()
 end
 
 --#endregion Enablers
+
+--------------------
+-- ENTITY FILTERS --
+--#region-----------
+
+local function inventorySlotFilter(v)
+  return function(ent)
+    if ent.itemSlot ~= nil then
+      if ent.itemSlot.name == string.lower(v) then
+        return true
+      end
+    end
+
+    local e = ent.name
+
+    if e == "CharRules_NoneItem" or e == "CharRules_DefaultItem" then
+      return true
+    end
+  end
+end
+
+local function spellFilter(ent)
+  return ent.itemSlot ~= nil and ent.itemSlot.name == "spell"
+end
+
+local function charmFilter(ent)
+  return ent.itemSlot ~= nil and ent.itemSlot.name == "misc"
+end
+
+--#endregion Entity Filters
 
 -------------
 -- ACTIONS --
@@ -440,13 +514,210 @@ Inventory = PowerSettings.group {
 }
 
 --#region INVENTORY SETTINGS--
+InventoryItems = PowerSettings.group {
+  id="inventory.items",
+  name="Items",
+  desc="Set specific items here.",
+  order=0
+}
+
+--#region Items settings--
+for i, v in ipairs({"Body", "Action", "Feet", "Head", "Ring", "Shovel", "Torch", "Weapon", "HUD"}) do
+  _G["InventoryItems" .. v] = PowerSettings.entitySchema.entity {
+    id="inventory.items." .. string.lower(v),
+    name=v,
+    desc="The item in the " .. v .. " slot.",
+    order=i,
+    default="CharRules_DefaultItem",
+    filter=inventorySlotFilter(v),
+    format=inventorySlotFormat
+  }
+end
+
+InventoryItemsBombs = PowerSettings.entitySchema.number {
+  id="inventory.items.bombs",
+  name="Bombs",
+  desc="How many bombs for the run?",
+  order=12,
+  minimum=-2,
+  default=-2,
+  editAsString=true,
+  format=function(val)
+    if val == -2 then return "(Default)"
+    elseif val == -1 then return "(Infinite)"
+    else return tostring(val) end
+  end
+}
+
+InventoryItemsSpells = PowerSettings.group {
+  id="inventory.items.spells",
+  name="Spells",
+  desc="Manipulate your spells here",
+  order=13
+}
+
+InventoryItemsSpellsTake = PowerSettings.entitySchema.bool {
+  id="inventory.items.spells.take",
+  name="Take starting spells",
+  desc="Take away the spells at the start",
+  order=1,
+  default=false
+}
+
+InventoryItemsSpellsGiven = PowerSettings.entitySchema.list.entity {
+  id="inventory.items.spells.give",
+  name="Spells to give",
+  desc="Add spells to give",
+  order=2,
+  default={},
+  filter=spellFilter,
+  itemDefault="SpellFireball"
+}
+
+InventoryItemsCharms = PowerSettings.group {
+  id="inventory.items.charms",
+  name="Charms",
+  desc="Manipulate your charms here",
+  order=14
+}
+
+InventoryItemsCharmsTake = PowerSettings.entitySchema.bool {
+  id="inventory.items.charms.take",
+  name="Take starting charms",
+  desc="Take away the charms at the start",
+  order=1,
+  default=false
+}
+
+InventoryItemsCharmsGiven = PowerSettings.entitySchema.list.entity {
+  id="inventory.items.charms.give",
+  name="Charms to give",
+  desc="Add charms to give",
+  order=2,
+  default={},
+  filter=charmFilter,
+  itemDefault="MiscPotion"
+}
+
+InventoryItemsOther = PowerSettings.entitySchema.list.entity {
+  id="inventory.items.other",
+  name="Other items",
+  desc="Add more items",
+  order=15,
+  default={},
+  filter="item",
+  itemDefault="MiscPotion"
+}
+--#endregion
 
 --#endregion
+
+Health = PowerSettings.group {
+  id="health",
+  name="Health settings",
+  desc="Rules relating to health.",
+  order=4
+}
+
+--#region HEALTH SETTINGS
+
+HealthAmount = PowerSettings.entitySchema.number {
+  id="health.amount",
+  name="Amount of health",
+  desc="The total amount of health to use.",
+  order=0,
+  visibleIf=function() return not isAdvanced() end,
+  minimum=-1,
+  maximum=10,
+  default=-1,
+  format=healthAmountFormat
+}
+
+HealthUse = PowerSettings.entitySchema.bool {
+  id="health.use",
+  name="Use these settings",
+  desc="Whether or not the below settings should apply.",
+  order=1,
+  visibleIf=isAdvanced,
+  default=false
+}
+
+HealthHearts = PowerSettings.entitySchema.number {
+  id="health.hearts",
+  name="Starting health",
+  desc="The number of half-hearts to start with.",
+  order=2,
+  minimum=1,
+  default=6,
+  upperBound="mod.CharRules.health.containers",
+  format=healthFormat,
+  visibleIf=isAdvanced
+}
+
+HealthContainers = PowerSettings.entitySchema.number {
+  id="health.containers",
+  name="Health containers",
+  desc="The number of half-heart containers to start with.",
+  order=3,
+  lowerBound="mod.CharRules.health.hearts",
+  default=6,
+  upperBound=function()
+    return get("health.limit") - get("health.cursed")
+  end,
+  format=healthFormat,
+  visibleIf=isAdvanced
+}
+
+HealthCursed = PowerSettings.entitySchema.number {
+  id="health.cursed",
+  name="Cursed health",
+  desc="The number of half-cursed hearts to start with.",
+  order=4,
+  minimum=0,
+  default=0,
+  upperBound=function()
+    return get("health.limit") - get("health.containers")
+  end,
+  format=zeroableHealthFormat,
+  visibleIf=isAdvancedAndAmplified
+}
+
+HealthLimit = PowerSettings.entitySchema.number {
+  id="health.limit",
+  name="Health limit",
+  desc="The number of half-hearts the player may ever hold.",
+  order=5,
+  lowerBound=function()
+    return get("health.containers") + get("health.cursed")
+  end,
+  default=20,
+  maximum=30,
+  format=healthFormat,
+  visibleIf=isAdvanced
+}
+
+--#endregion
+
+Other = PowerSettings.group {
+  id="other",
+  name="Other",
+  desc="Other stuff",
+  order=5
+}
+
+OtherMapgen = PowerSettings.entitySchema.bitflag {
+  id="other.mapGen",
+  name="Map gen for",
+  desc="Whose map gen should be used?",
+  order=0,
+  visibleIf=isAdvanced,
+  default=CREnum.MapGen.DEFAULT,
+  flags=CREnum.MapGen,
+  presets=CREnum.MapGenPresets
+}
 
 --#endregion
 
 return {
-  get = function(setting)
-    return PowerSettings.get("mod.CharRules." .. setting)
-  end
+  get = get
 }
