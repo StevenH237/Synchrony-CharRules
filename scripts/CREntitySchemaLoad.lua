@@ -196,90 +196,25 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides", sequ
   --#region Items
   local inv = entity.initialInventory or {items={}}
   local items = inv.items
-  local newItems = {}
+  local newItems
 
   --First, delete the old items if necessary
-  for i, v in ipairs(items) do
-    local slot = CRSchema.itemSlots[v]
-    if (slot == "body" or slot == "action" or slot == "feet" or slot == "head" or slot == "ring" or slot == "shovel" or slot == "torch" or slot == "weapon") then
-      local setting = CRSettings.get("inventory.items." .. slot)
-      if setting == "CharRules_DefaultItem" then
-        local boost = CRSchema.healthIncreasingItems[v] or 0
-        healthBoost = healthBoost + boost
+  local clearInv = CRSettings.get("inventory.items.clear")
 
-        newItems[#newItems+1] = v
-      end
-    end
-
-    if slot == "bomb" then
-      local setting = CRSettings.get("inventory.items.bombs")
-      if setting == -2 then
-        local boost = CRSchema.healthIncreasingItems[v] or 0
-        healthBoost = healthBoost + boost
-
-        newItems[#newItems+1] = v
-      end
-    end
-
-    if slot == "spell" then
-      local setting = CRSettings.get("inventory.items.spells.take")
-      if not setting then
-        local boost = CRSchema.healthIncreasingItems[v] or 0
-        healthBoost = healthBoost + boost
-
-        newItems[#newItems+1] = v
-      end
-    end
-
-    if slot == "misc" then
-      local setting = CRSettings.get("inventory.items.charms.take")
-      if not setting then
-        local boost = CRSchema.healthIncreasingItems[v] or 0
-        healthBoost = healthBoost + boost
-
-        newItems[#newItems+1] = v
-      end
+  if clearInv then
+    newItems = {}
+  else
+    -- If we're not deleting, we should check for health boosters
+    newItems = items
+    for i, v in ipairs(items) do
+      local boost = CRSchema.healthIncreasingItems[v] or 0
+      healthBoost = healthBoost + boost
     end
   end
 
   --Now pull the new items into the inventory
-  for i, v in ipairs({"body", "action", "feet", "head", "ring", "shovel", "torch", "weapon", "hud"}) do
-    local setting = CRSettings.get("inventory.items." .. v)
-    if setting ~= "CharRules_DefaultItem" and setting ~= "CharRules_NoneItem" then
-      local boost = CRSchema.healthIncreasingItems[setting] or 0
-      healthBoost = healthBoost + boost
-
-      newItems[#newItems+1] = setting
-    end
-  end
-
-  local bombs = CRSettings.get("inventory.items.bombs")
-  if bombs == -1 then
-    newItems[#newItems+1] = "BombInfinity"
-  elseif bombs > 0 then
-    for i = 1, bombs do
-      newItems[#newItems+1] = "Bomb"
-    end
-  end
-
-  local spells = CRSettings.get("inventory.items.spells.give")
-  for i, v in ipairs(spells) do
-    local boost = CRSchema.healthIncreasingItems[v] or 0
-    healthBoost = healthBoost + boost
-
-    newItems[#newItems+1] = v
-  end
-
-  local charms = CRSettings.get("inventory.items.charms.give")
-  for i, v in ipairs(charms) do
-    local boost = CRSchema.healthIncreasingItems[v] or 0
-    healthBoost = healthBoost + boost
-
-    newItems[#newItems+1] = v
-  end
-
-  local other = CRSettings.get("inventory.items.other")
-  for i, v in ipairs(other) do
+  local give = CRSettings.get("inventory.items.give")
+  for i, v in ipairs(give) do
     local boost = CRSchema.healthIncreasingItems[v] or 0
     healthBoost = healthBoost + boost
 

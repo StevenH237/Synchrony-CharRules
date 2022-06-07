@@ -56,26 +56,6 @@ local function zeroableHealthFormat(amt)
   return amt .. " (" .. (amt / 2) .. " hearts)"
 end
 
-local function inventorySlotFormat(value)
-  local entity = Entities.getEntityPrototype(value)
-
-  if entity then
-    if entity.friendlyName then
-      if SettingsStorage.get("config.showAdvanced")
-        and value ~= "CharRules_NoneItem"
-        and value ~= "CharRules_DefaultItem" then
-        return entity.friendlyName.name .. " (" .. value .. ")"
-      else
-        return entity.friendlyName.name
-      end
-    else
-      return value
-    end
-  else
-    return "(No such entity: " .. value .. ")"
-  end
-end
-
 local function healthAmountFormat(value)
   if value == -1 then return "(Default)"
   elseif value == 0 then return "Half a heart"
@@ -102,36 +82,6 @@ local function isAdvancedAndAmplified()
 end
 
 --#endregion Enablers
-
---------------------
--- ENTITY FILTERS --
---#region-----------
-
-local function inventorySlotFilter(v)
-  return function(ent)
-    if ent.itemSlot ~= nil then
-      if ent.itemSlot.name == string.lower(v) then
-        return true
-      end
-    end
-
-    local e = ent.name
-
-    if e == "CharRules_NoneItem" or e == "CharRules_DefaultItem" then
-      return true
-    end
-  end
-end
-
-local function spellFilter(ent)
-  return ent.itemSlot ~= nil and ent.itemSlot.name == "spell"
-end
-
-local function charmFilter(ent)
-  return ent.itemSlot ~= nil and ent.itemSlot.name == "misc"
-end
-
---#endregion Entity Filters
 
 -------------
 -- ACTIONS --
@@ -522,88 +472,19 @@ InventoryItems = PowerSettings.group {
 }
 
 --#region Items settings--
-for i, v in ipairs({"Body", "Action", "Feet", "Head", "Ring", "Shovel", "Torch", "Weapon", "HUD"}) do
-  _G["InventoryItems" .. v] = PowerSettings.entitySchema.entity {
-    id="inventory.items." .. string.lower(v),
-    name=v,
-    desc="The item in the " .. v .. " slot.",
-    order=i,
-    default="CharRules_DefaultItem",
-    filter=inventorySlotFilter(v),
-    format=inventorySlotFormat
-  }
-end
-
-InventoryItemsBombs = PowerSettings.entitySchema.number {
-  id="inventory.items.bombs",
-  name="Bombs",
-  desc="How many bombs for the run?",
-  order=12,
-  minimum=-2,
-  default=-2,
-  editAsString=true,
-  format=function(val)
-    if val == -2 then return "(Default)"
-    elseif val == -1 then return "(Infinite)"
-    else return tostring(val) end
-  end
-}
-
-InventoryItemsSpells = PowerSettings.group {
-  id="inventory.items.spells",
-  name="Spells",
-  desc="Manipulate your spells here",
-  order=13
-}
-
-InventoryItemsSpellsTake = PowerSettings.entitySchema.bool {
-  id="inventory.items.spells.take",
-  name="Take starting spells",
-  desc="Take away the spells at the start",
-  order=1,
+InventoryItemsClear = PowerSettings.entitySchema.bool {
+  id="inventory.items.clear",
+  name="Clear inventory",
+  desc="Clear inventory before giving new items",
+  order=0,
   default=false
 }
 
-InventoryItemsSpellsGiven = PowerSettings.entitySchema.list.entity {
-  id="inventory.items.spells.give",
-  name="Spells to give",
-  desc="Add spells to give",
-  order=2,
-  default={},
-  filter=spellFilter,
-  itemDefault="SpellFireball"
-}
-
-InventoryItemsCharms = PowerSettings.group {
-  id="inventory.items.charms",
-  name="Charms",
-  desc="Manipulate your charms here",
-  order=14
-}
-
-InventoryItemsCharmsTake = PowerSettings.entitySchema.bool {
-  id="inventory.items.charms.take",
-  name="Take starting charms",
-  desc="Take away the charms at the start",
-  order=1,
-  default=false
-}
-
-InventoryItemsCharmsGiven = PowerSettings.entitySchema.list.entity {
-  id="inventory.items.charms.give",
-  name="Charms to give",
-  desc="Add charms to give",
-  order=2,
-  default={},
-  filter=charmFilter,
-  itemDefault="MiscPotion"
-}
-
-InventoryItemsOther = PowerSettings.entitySchema.list.entity {
-  id="inventory.items.other",
-  name="Other items",
+InventoryItemsGive = PowerSettings.entitySchema.list.entity {
+  id="inventory.items.give",
+  name="Give items",
   desc="Add more items",
-  order=15,
+  order=1,
   default={},
   filter="item",
   itemDefault="MiscPotion"
