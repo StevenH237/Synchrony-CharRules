@@ -87,14 +87,6 @@ end
 -- ACTIONS --
 --#region----
 
-local function actionReset()
-  print(Settings.Visibility)
-  local keys = SettingsStorage.listKeys("mod.CharRules", Settings.Layer.REMOTE_OVERRIDE)
-  for _, key in ipairs(keys) do
-    SettingsStorage.set(key, nil, Settings.Layer.REMOTE_PENDING)
-  end
-end
-
 local function charJump(char, noDLC)
   if noDLC and not isAmplified() then
     return function() Menu.selectByID("mod.CharRules.characters." .. noDLC) end
@@ -107,6 +99,13 @@ end
 --------------
 -- SETTINGS --
 --#region-----
+
+RandomSeed = PowerSettings.entitySchema.number {
+  id = "random",
+  name = "Random seed",
+  desc = "Seed for the randomizer. Always randomized when a run starts.",
+  visibility = Settings.Visibility.HIDDEN
+}
 
 Advanced = PowerSettings.entitySchema.bool {
   id = "advanced",
