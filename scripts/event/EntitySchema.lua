@@ -51,7 +51,6 @@ end
 --#region---
 
 Event.entitySchemaGenerate.add("checks", { order = "components", sequence = -1 }, function()
-  print("New entity schema generation...")
   RNGChannel = {
     state1 = 237,
     state2 = 794824,
@@ -73,7 +72,6 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
   --#region Character-specific rules
   --#region Aria's rules
   local rule = getTristateSetting("characters.missedBeat")
-  print("Missed beat rule for " .. entity.name .. ": " .. rule)
   if rule == CREnum.Tristate.YES then
     entity.grooveChainInflictDamageOnDrop = entity.grooveChainInflictDamageOnDrop or {}
     entity.grooveChainInflictDamageOnDrop.active = true
@@ -286,6 +284,139 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
 
   inv.items = newItems
   entity.initialInventory = inv
+  --#endregion
+
+  --#region Item bans
+  local banFlags = entity.inventoryBannedItems or { components = {} }
+  local comps = banFlags.components
+
+  rule = getTristateSetting("inventory.bans.cirt")
+  if rule == CREnum.Tristate.YES then
+    comps.consumableIgnoreRhythmTemporarily = ItemBan.Type.GENERATION_FULL
+  else
+    comps.consumableIgnoreRhythmTemporarily = nil
+  end
+
+  rule = getTristateSetting("inventory.bans.healthlocked")
+  if rule == CREnum.Tristate.YES then
+    comps.itemBanHealthlocked = ItemBan.Type.GENERATION_FULL
+  else
+    comps.itemBanHealthlocked = nil
+  end
+
+  rule = getTristateSetting("inventory.bans.noDamage")
+  if rule == CREnum.Tristate.YES then
+    comps.itemBanNoDamage = ItemBan.Type.GENERATION_FULL
+  else
+    comps.itemBanNoDamage = nil
+  end
+
+  rule = getTristateSetting("inventory.bans.pacifist")
+  if rule == CREnum.Tristate.YES then
+    comps.itemBanPacifist = ItemBan.Type.GENERATION_FULL
+  else
+    comps.itemBanPacifist = nil
+  end
+
+  rule = getTristateSetting("inventory.bans.poverty")
+  if rule == CREnum.Tristate.YES then
+    comps.itemBanPoverty = ItemBan.Type.GENERATION_FULL
+  else
+    comps.itemBanPoverty = nil
+  end
+
+  rule = getTristateSetting("inventory.bans.weaponlocked")
+  if rule == CREnum.Tristate.YES then
+    comps.itemBanWeaponlocked = ItemBan.Type.GENERATION_FULL
+  else
+    comps.itemBanWeaponlocked = nil
+  end
+
+  rule = getTristateSetting("inventory.bans.grooveChainImmunity")
+  if rule == CREnum.Tristate.YES then
+    comps.itemGrooveChainImmunity = ItemBan.Type.GENERATION_FULL
+  else
+    comps.itemGrooveChainImmunity = nil
+  end
+
+  entity.inventoryBannedItems = banFlags
+  --#endregion
+
+  --#region Slot curses
+  local cursedSlots = entity.inventoryCursedSlots or { slots = {} }
+  local slots = cursedSlots.slots
+
+  rule = getTristateSetting("inventory.curses.action")
+  if rule == CREnum.Tristate.YES then
+    slots.action = true
+  else
+    slots.action = nil
+  end
+
+  rule = getTristateSetting("inventory.curses.shovel")
+  if rule == CREnum.Tristate.YES then
+    slots.shovel = true
+  else
+    slots.shovel = nil
+  end
+
+  rule = getTristateSetting("inventory.curses.weapon")
+  if rule == CREnum.Tristate.YES then
+    slots.weapon = true
+  else
+    slots.weapon = nil
+  end
+
+  rule = getTristateSetting("inventory.curses.body")
+  if rule == CREnum.Tristate.YES then
+    slots.body = true
+  else
+    slots.body = nil
+  end
+
+  rule = getTristateSetting("inventory.curses.head")
+  if rule == CREnum.Tristate.YES then
+    slots.head = true
+  else
+    slots.head = nil
+  end
+
+  rule = getTristateSetting("inventory.curses.feet")
+  if rule == CREnum.Tristate.YES then
+    slots.feet = true
+  else
+    slots.feet = nil
+  end
+
+  rule = getTristateSetting("inventory.curses.torch")
+  if rule == CREnum.Tristate.YES then
+    slots.torch = true
+  else
+    slots.torch = nil
+  end
+
+  rule = getTristateSetting("inventory.curses.ring")
+  if rule == CREnum.Tristate.YES then
+    slots.ring = true
+  else
+    slots.ring = nil
+  end
+
+  rule = getTristateSetting("inventory.curses.misc")
+  if rule == CREnum.Tristate.YES then
+    slots.misc = true
+  else
+    slots.misc = nil
+  end
+
+  rule = getTristateSetting("inventory.curses.spell")
+  if rule == CREnum.Tristate.YES then
+    slots.spell = true
+  else
+    slots.spell = nil
+  end
+
+  entity.inventoryCursedSlots = cursedSlots
   --#endregion
   --#endregion
 

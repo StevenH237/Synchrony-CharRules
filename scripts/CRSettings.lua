@@ -490,6 +490,182 @@ Inventory_Items_Give = PowerSettings.entitySchema.list.entity {
 }
 --#endregion
 
+Inventory_Bans = PowerSettings.group {
+  id = "inventory.bans",
+  name = "Bans",
+  desc = "Set item bans here.",
+  order = 1
+}
+
+--#region Item bans settings--
+
+Inventory_Bans_CIRT = PowerSettings.entitySchema.enum {
+  id = "inventory.bans.cirt",
+  name = "Heart transplants",
+  desc = "Items that ignore the rhythm temporarily on use",
+  order = 0,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+Inventory_Bans_Healthlocked = PowerSettings.entitySchema.enum {
+  id = "inventory.bans.healthlocked",
+  name = "Health-increasing items",
+  desc = "Items that increase health",
+  order = 1,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+Inventory_Bans_NoDamage = PowerSettings.entitySchema.enum {
+  id = "inventory.bans.noDamage",
+  name = "Damage-increasing items",
+  desc = "Items that increase damage output",
+  order = 2,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+Inventory_Bans_Pacifist = PowerSettings.entitySchema.enum {
+  id = "inventory.bans.pacifist",
+  name = "Pacifism",
+  desc = "Item bans due to pacifism",
+  order = 3,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+Inventory_Bans_Poverty = PowerSettings.entitySchema.enum {
+  id = "inventory.bans.poverty",
+  name = "Gold-collecting items",
+  desc = "Items that collect gold",
+  order = 4,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+Inventory_Bans_Weaponlocked = PowerSettings.entitySchema.enum {
+  id = "inventory.bans.weaponlocked",
+  name = "Weapons",
+  desc = "Other weapons",
+  order = 5,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+Inventory_Bans_GrooveChainImmunity = PowerSettings.entitySchema.enum {
+  id = "inventory.bans.grooveChainImmunity",
+  name = "Groove chain immunity",
+  desc = "Items that ignore missed beats while held",
+  order = 6,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+--#endregion
+
+Inventory_Curses = PowerSettings.group {
+  id = "inventory.curses",
+  name = "Cursed inventory slots",
+  desc = "Curse slots.",
+  order = 2
+}
+
+--#region Inventory curses settings--
+
+Inventory_Curses_Action = PowerSettings.entitySchema.enum {
+  id = "inventory.curses.action",
+  name = "Consumable item",
+  desc = "Curse the consumable item slot",
+  order = 0,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+Inventory_Curses_Shovel = PowerSettings.entitySchema.enum {
+  id = "inventory.curses.shovel",
+  name = "Shovel",
+  desc = "Curse the shovel slot",
+  order = 1,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+Inventory_Curses_Weapon = PowerSettings.entitySchema.enum {
+  id = "inventory.curses.weapon",
+  name = "Weapon",
+  desc = "Curse the weapon slot",
+  order = 2,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+Inventory_Curses_Body = PowerSettings.entitySchema.enum {
+  id = "inventory.curses.body",
+  name = "Body (armor)",
+  desc = "Curse the body slot",
+  order = 3,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+Inventory_Curses_Head = PowerSettings.entitySchema.enum {
+  id = "inventory.curses.head",
+  name = "Head",
+  desc = "Curse the head slot",
+  order = 4,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+Inventory_Curses_Feet = PowerSettings.entitySchema.enum {
+  id = "inventory.curses.feet",
+  name = "Feet",
+  desc = "Curse the feet slot",
+  order = 5,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+Inventory_Curses_Torch = PowerSettings.entitySchema.enum {
+  id = "inventory.curses.torch",
+  name = "Torch",
+  desc = "Curse the torch item slot",
+  order = 6,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+Inventory_Curses_Ring = PowerSettings.entitySchema.enum {
+  id = "inventory.curses.ring",
+  name = "Ring",
+  desc = "Curse the ring slot",
+  order = 7,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+Inventory_Curses_Misc = PowerSettings.entitySchema.enum {
+  id = "inventory.curses.misc",
+  name = "Charms",
+  desc = "Curse the charms slot",
+  order = 8,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+Inventory_Curses_Spell = PowerSettings.entitySchema.enum {
+  id = "inventory.curses.spell",
+  name = "Spell",
+  desc = "Curse the spell slot",
+  order = 9,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+
+--#endregion
+
 --#endregion
 
 Health = PowerSettings.group {
