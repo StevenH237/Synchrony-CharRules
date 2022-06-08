@@ -81,6 +81,12 @@ local function isAdvancedAndAmplified()
   return isAdvanced() and isAmplified()
 end
 
+local function isSynchrony()
+  -- In the future, this function will only return true if the second DLC
+  -- is loaded.
+  return true
+end
+
 --#endregion Enablers
 
 -------------
@@ -341,11 +347,21 @@ Characters_DoubleTime = PowerSettings.entitySchema.enum {
   visibleIf = function() return not isAdvanced() end
 }
 
+Characters_ParityMovement = PowerSettings.entitySchema.enum {
+  id = "characters.parityMovement",
+  name = "Parity movement",
+  desc = "Enemies move at normal tempo",
+  order = 24,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate,DEFAULT,
+  visibleIf = isSynchrony
+}
+
 Characters_CustomTempo = PowerSettings.entitySchema.number {
   id = "characters.customTempo",
   name = "Tempo multiplier",
   desc = "Should characters play at a custom tempo",
-  order = 24,
+  order = 25,
   default = 0,
   minimum = 0,
   maximum = 20,
@@ -356,7 +372,7 @@ Characters_CustomTempo = PowerSettings.entitySchema.number {
 Characters_Bard = PowerSettings.entitySchema.action {
   id = "characters.bard",
   name = "\3*cc5Bard's rules\3r",
-  order = 25,
+  order = 26,
   leftAction = charJump("bolt"),
   rightAction = charJump("mary", "aria")
 }
@@ -365,7 +381,7 @@ Characters_NoBeats = PowerSettings.entitySchema.enum {
   id = "characters.noBeats",
   name = "Ignore rhythm",
   desc = "Characters ignore the rhythm of the music.",
-  order = 26,
+  order = 27,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -373,7 +389,7 @@ Characters_NoBeats = PowerSettings.entitySchema.enum {
 Characters_Mary = PowerSettings.entitySchema.action {
   id = "characters.mary",
   name = "\3*cc5Mary's rules\3r",
-  order = 27,
+  order = 28,
   leftAction = charJump("bard"),
   rightAction = charJump("tempo"),
   visibleIf = isAmplified
@@ -383,7 +399,7 @@ Characters_Marv = PowerSettings.entitySchema.enum {
   id = "characters.marv",
   name = "Protect a sheep",
   desc = "A sheep follows you that must be kept alive",
-  order = 28,
+  order = 29,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
   visibleIf = isAmplified
@@ -392,7 +408,7 @@ Characters_Marv = PowerSettings.entitySchema.enum {
 Characters_Tempo = PowerSettings.entitySchema.action {
   id = "characters.tempo",
   name = "\3*cc5Tempo's rules\3r",
-  order = 29,
+  order = 30,
   leftAction = charJump("mary"),
   rightAction = charJump("aria"),
   visibleIf = isAmplified
@@ -402,7 +418,7 @@ Characters_DamageUp = PowerSettings.entitySchema.enum {
   id = "characters.damageUp",
   name = "Increase damage",
   desc = "Should your attack damage be increased",
-  order = 30,
+  order = 31,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
   visibleIf = isAmplified
@@ -412,7 +428,7 @@ Characters_DamageUpAmount = PowerSettings.entitySchema.number {
   id = "characters.damageUpAmount",
   name = "Damage increase amount",
   desc = "How much should your attack damage be increased",
-  order = 31,
+  order = 32,
   default = 0,
   minimum = 0,
   maximum = 999,
@@ -425,7 +441,7 @@ Characters_KillTimer = PowerSettings.entitySchema.enum {
   id = "characters.killTimer",
   name = "Kill timer",
   desc = "Must kill every few beats or you take damage",
-  order = 32,
+  order = 33,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
   visibleIf = isAmplified
@@ -435,7 +451,7 @@ Characters_KillTimerDamage = PowerSettings.entitySchema.number {
   id = "characters.killTimerDamage",
   name = "Amount of damage",
   desc = "The amount of damage from the kill timer.",
-  order = 33,
+  order = 34,
   visibleIf = isAdvancedAndAmplified,
   default = 0,
   minimum = 0,
@@ -447,7 +463,7 @@ Characters_KillTimerType = PowerSettings.entitySchema.bitflag {
   id = "characters.killTimerType",
   name = "Type of damage",
   desc = "The type of damage from the kill timer.",
-  order = 34,
+  order = 35,
   visibleIf = isAdvancedAndAmplified,
   default = Damage.Type.SUICIDE,
   flags = Damage.Flag,
