@@ -122,13 +122,13 @@ Characters = PowerSettings.group {
 }
 
 --#region CHARACTER SETTINGS--
-CharactersHeader = PowerSettings.entitySchema.label {
+Characters_Header = PowerSettings.entitySchema.label {
   id = "characters.header",
   name = "Jump between sections with left/right on section headers!",
   order = -1
 }
 
-CharactersAria = PowerSettings.entitySchema.action {
+Characters_Aria = PowerSettings.entitySchema.action {
   id = "characters.aria",
   name = "\3*cc5Aria's rules\3r",
   order = 0,
@@ -136,7 +136,7 @@ CharactersAria = PowerSettings.entitySchema.action {
   rightAction = charJump("dorian")
 }
 
-CharactersMissedbeat = PowerSettings.entitySchema.enum {
+Characters_MissedBeat = PowerSettings.entitySchema.enum {
   id = "characters.missedBeat",
   name = "Damage on missed beat",
   desc = "Whether or not players should take damage on a missed beat.",
@@ -145,7 +145,7 @@ CharactersMissedbeat = PowerSettings.entitySchema.enum {
   default = CREnum.Quatristate.DEFAULT
 }
 
-CharactersMissedbeatdamage = PowerSettings.entitySchema.number {
+Characters_MissedBeatDamage = PowerSettings.entitySchema.number {
   id = "characters.missedBeatDamage",
   name = "Amount of damage",
   desc = "The amount of damage on a missed beat.",
@@ -157,7 +157,7 @@ CharactersMissedbeatdamage = PowerSettings.entitySchema.number {
   format = healthFormat
 }
 
-CharactersMissedbeattype = PowerSettings.entitySchema.bitflag {
+Characters_MissedBeatType = PowerSettings.entitySchema.bitflag {
   id = "characters.missedBeatType",
   name = "Type of damage",
   desc = "The type of damage on a missed beat.",
@@ -168,7 +168,7 @@ CharactersMissedbeattype = PowerSettings.entitySchema.bitflag {
   presets = Damage.Type
 }
 
-CharactersBypasssarcophagus = PowerSettings.entitySchema.enum {
+Characters_BypassSarcophagus = PowerSettings.entitySchema.enum {
   id = "characters.bypassSarcophagus",
   name = "Bypass sarcophagus",
   desc = "Whether or not stairs should be locked until a sarcophagus is destroyed",
@@ -178,7 +178,7 @@ CharactersBypasssarcophagus = PowerSettings.entitySchema.enum {
   default = CREnum.Quatristate.DEFAULT
 }
 
-CharactersDorian = PowerSettings.entitySchema.action {
+Characters_Dorian = PowerSettings.entitySchema.action {
   id = "characters.dorian",
   name = "\3*cc5Dorian's rules\3r",
   order = 5,
@@ -186,7 +186,7 @@ CharactersDorian = PowerSettings.entitySchema.action {
   rightAction = charJump("eli")
 }
 
-CharactersCursedboots = PowerSettings.entitySchema.enum {
+Characters_CursedBoots = PowerSettings.entitySchema.enum {
   id = "characters.cursedBoots",
   name = "Boots of painful leaping",
   desc = "Should boots of leaping or lunging cause damage when disabled while moving",
@@ -195,13 +195,13 @@ CharactersCursedboots = PowerSettings.entitySchema.enum {
   default = CREnum.Quatristate.DEFAULT
 }
 
-CharactersCursedbootslabel = PowerSettings.entitySchema.label {
+Characters_CursedBootsLabel = PowerSettings.entitySchema.label {
   id = "characters.cursedBootsLabel",
   name = "To actually apply the boots, go to Inventory.",
   order = 7
 }
 
-CharactersCursedbootsdamage = PowerSettings.entitySchema.number {
+Characters_CursedBootsDamage = PowerSettings.entitySchema.number {
   id = "characters.cursedBootsDamage",
   name = "Amount of damage",
   desc = "The amount of damage from cursed boots.",
@@ -213,7 +213,7 @@ CharactersCursedbootsdamage = PowerSettings.entitySchema.number {
   format = healthFormat
 }
 
-CharactersCursedbootstype = PowerSettings.entitySchema.bitflag {
+Characters_CursedBootsType = PowerSettings.entitySchema.bitflag {
   id = "characters.cursedBootsType",
   name = "Type of damage",
   desc = "The type of damage from cursed boots.",
@@ -224,7 +224,7 @@ CharactersCursedbootstype = PowerSettings.entitySchema.bitflag {
   presets = Damage.Type
 }
 
-CharactersEli = PowerSettings.entitySchema.action {
+Characters_Eli = PowerSettings.entitySchema.action {
   id = "characters.eli",
   name = "\3*cc5Eli's rules\3r",
   order = 10,
@@ -232,13 +232,13 @@ CharactersEli = PowerSettings.entitySchema.action {
   rightAction = charJump("monk")
 }
 
-CharactersElibombs = PowerSettings.entitySchema.label {
+Characters_EliBombs = PowerSettings.entitySchema.label {
   id = "characters.eliBombs",
   name = "For infinite bombs, go to Inventory.",
   order = 11
 }
 
-CharactersEliwalls = PowerSettings.entitySchema.enum {
+Characters_EliWalls = PowerSettings.entitySchema.enum {
   id = "characters.eliWalls",
   name = "Empty shop walls",
   desc = "Should shop walls be devoid of gold?",
@@ -247,7 +247,7 @@ CharactersEliwalls = PowerSettings.entitySchema.enum {
   default = CREnum.Quatristate.DEFAULT
 }
 
-CharactersMonk = PowerSettings.entitySchema.action {
+Characters_Monk = PowerSettings.entitySchema.action {
   id = "characters.monk",
   name = "\3*cc5Monk's rules\3r",
   order = 13,
@@ -255,7 +255,7 @@ CharactersMonk = PowerSettings.entitySchema.action {
   rightAction = charJump("dove")
 }
 
-CharactersPoverty = PowerSettings.entitySchema.enum {
+Characters_Poverty = PowerSettings.entitySchema.enum {
   id = "characters.poverty",
   name = "Vow of poverty",
   desc = "Die on picking up gold",
@@ -264,7 +264,7 @@ CharactersPoverty = PowerSettings.entitySchema.enum {
   default = CREnum.Quatristate.DEFAULT
 }
 
-CharactersShoplifter = PowerSettings.entitySchema.enum {
+Characters_Shoplifter = PowerSettings.entitySchema.enum {
   id = "characters.shoplifter",
   name = "Free items from shops",
   desc = "Character receives one free item per shop",
@@ -273,7 +273,7 @@ CharactersShoplifter = PowerSettings.entitySchema.enum {
   default = CREnum.Quatristate.DEFAULT
 }
 
-CharactersDescentcollect = PowerSettings.entitySchema.enum {
+Characters_DescentCollect = PowerSettings.entitySchema.enum {
   id = "characters.descentCollect",
   name = "Collect gold on stairs",
   desc = "When descending the stairs, pickup all dropped gold",
@@ -282,7 +282,7 @@ CharactersDescentcollect = PowerSettings.entitySchema.enum {
   default = CREnum.Quatristate.DEFAULT
 }
 
-CharactersEnemygold = PowerSettings.entitySchema.enum {
+Characters_EnemyGold = PowerSettings.entitySchema.enum {
   id = "characters.enemyGold",
   name = "All enemies drop gold",
   desc = "All enemies drop at least one gold when killed",
@@ -291,7 +291,7 @@ CharactersEnemygold = PowerSettings.entitySchema.enum {
   default = CREnum.Quatristate.DEFAULT
 }
 
-CharactersDove = PowerSettings.entitySchema.action {
+Characters_Dove = PowerSettings.entitySchema.action {
   id = "characters.dove",
   name = "\3*cc5Dove's rules\3r",
   order = 18,
@@ -299,13 +299,13 @@ CharactersDove = PowerSettings.entitySchema.action {
   rightAction = charJump("bolt")
 }
 
-CharactersDovelabel = PowerSettings.entitySchema.label {
+Characters_DoveLabel = PowerSettings.entitySchema.label {
   id = "characters.doveLabel",
   name = "For the flower, go to Inventory.",
   order = 19
 }
 
-CharactersTeleportingbombs = PowerSettings.entitySchema.enum {
+Characters_TeleportingBombs = PowerSettings.entitySchema.enum {
   id = "characters.teleportingBombs",
   name = "Teleporting bombs",
   desc = "When enemies are hit by bombs, they're teleported instead of damaged.",
@@ -314,7 +314,7 @@ CharactersTeleportingbombs = PowerSettings.entitySchema.enum {
   default = CREnum.Quatristate.DEFAULT
 }
 
-CharactersBypassminiboss = PowerSettings.entitySchema.enum {
+Characters_BypassMiniboss = PowerSettings.entitySchema.enum {
   id = "characters.bypassMiniboss",
   name = "Bypass miniboss",
   desc = "Should minibosses be bypassed for the stairs lock?",
@@ -323,7 +323,7 @@ CharactersBypassminiboss = PowerSettings.entitySchema.enum {
   default = CREnum.Quatristate.DEFAULT
 }
 
-CharactersBolt = PowerSettings.entitySchema.action {
+Characters_Bolt = PowerSettings.entitySchema.action {
   id = "characters.bolt",
   name = "\3*cc5Bolt's rules\3r",
   order = 22,
@@ -331,7 +331,7 @@ CharactersBolt = PowerSettings.entitySchema.action {
   rightAction = charJump("bard")
 }
 
-CharactersDoubletime = PowerSettings.entitySchema.enum {
+Characters_DoubleTime = PowerSettings.entitySchema.enum {
   id = "characters.doubleTime",
   name = "Double tempo",
   desc = "Should characters play at double tempo",
@@ -341,7 +341,7 @@ CharactersDoubletime = PowerSettings.entitySchema.enum {
   visibleIf = function() return not isAdvanced() end
 }
 
-CharactersCustomtempo = PowerSettings.entitySchema.number {
+Characters_CustomTempo = PowerSettings.entitySchema.number {
   id = "characters.customTempo",
   name = "Tempo multiplier",
   desc = "Should characters play at a custom tempo",
@@ -353,7 +353,7 @@ CharactersCustomtempo = PowerSettings.entitySchema.number {
   visibleIf = isAdvanced
 }
 
-CharactersBard = PowerSettings.entitySchema.action {
+Characters_Bard = PowerSettings.entitySchema.action {
   id = "characters.bard",
   name = "\3*cc5Bard's rules\3r",
   order = 25,
@@ -361,7 +361,7 @@ CharactersBard = PowerSettings.entitySchema.action {
   rightAction = charJump("mary", "aria")
 }
 
-CharactersNobeats = PowerSettings.entitySchema.enum {
+Characters_NoBeats = PowerSettings.entitySchema.enum {
   id = "characters.noBeats",
   name = "Ignore rhythm",
   desc = "Characters ignore the rhythm of the music.",
@@ -370,7 +370,7 @@ CharactersNobeats = PowerSettings.entitySchema.enum {
   default = CREnum.Quatristate.DEFAULT
 }
 
-CharactersMary = PowerSettings.entitySchema.action {
+Characters_Mary = PowerSettings.entitySchema.action {
   id = "characters.mary",
   name = "\3*cc5Mary's rules\3r",
   order = 27,
@@ -379,7 +379,7 @@ CharactersMary = PowerSettings.entitySchema.action {
   visibleIf = isAmplified
 }
 
-CharactersMarv = PowerSettings.entitySchema.enum {
+Characters_Marv = PowerSettings.entitySchema.enum {
   id = "characters.marv",
   name = "Protect a sheep",
   desc = "A sheep follows you that must be kept alive",
@@ -389,7 +389,7 @@ CharactersMarv = PowerSettings.entitySchema.enum {
   visibleIf = isAmplified
 }
 
-CharactersTempo = PowerSettings.entitySchema.action {
+Characters_Tempo = PowerSettings.entitySchema.action {
   id = "characters.tempo",
   name = "\3*cc5Tempo's rules\3r",
   order = 29,
@@ -398,7 +398,7 @@ CharactersTempo = PowerSettings.entitySchema.action {
   visibleIf = isAmplified
 }
 
-CharactersDamageup = PowerSettings.entitySchema.enum {
+Characters_DamageUp = PowerSettings.entitySchema.enum {
   id = "characters.damageUp",
   name = "Increase damage",
   desc = "Should your attack damage be increased",
@@ -408,7 +408,7 @@ CharactersDamageup = PowerSettings.entitySchema.enum {
   visibleIf = isAmplified
 }
 
-CharactersDamageupamount = PowerSettings.entitySchema.number {
+Characters_DamageUpAmount = PowerSettings.entitySchema.number {
   id = "characters.damageUpAmount",
   name = "Damage increase amount",
   desc = "How much should your attack damage be increased",
@@ -421,7 +421,7 @@ CharactersDamageupamount = PowerSettings.entitySchema.number {
   format = numberFormat(0)
 }
 
-CharactersKilltimer = PowerSettings.entitySchema.enum {
+Characters_KillTimer = PowerSettings.entitySchema.enum {
   id = "characters.killTimer",
   name = "Kill timer",
   desc = "Must kill every few beats or you take damage",
@@ -431,7 +431,7 @@ CharactersKilltimer = PowerSettings.entitySchema.enum {
   visibleIf = isAmplified
 }
 
-CharactersKilltimerdamage = PowerSettings.entitySchema.number {
+Characters_KillTimerDamage = PowerSettings.entitySchema.number {
   id = "characters.killTimerDamage",
   name = "Amount of damage",
   desc = "The amount of damage from the kill timer.",
@@ -443,7 +443,7 @@ CharactersKilltimerdamage = PowerSettings.entitySchema.number {
   format = healthFormat
 }
 
-CharactersKilltimertype = PowerSettings.entitySchema.bitflag {
+Characters_KillTimerType = PowerSettings.entitySchema.bitflag {
   id = "characters.killTimerType",
   name = "Type of damage",
   desc = "The type of damage from the kill timer.",
@@ -463,7 +463,7 @@ Inventory = PowerSettings.group {
 }
 
 --#region INVENTORY SETTINGS--
-InventoryItems = PowerSettings.group {
+Inventory_Items = PowerSettings.group {
   id = "inventory.items",
   name = "Items",
   desc = "Set specific items here.",
@@ -471,7 +471,7 @@ InventoryItems = PowerSettings.group {
 }
 
 --#region Items settings--
-InventoryItemsClear = PowerSettings.entitySchema.bool {
+Inventory_Items_Clear = PowerSettings.entitySchema.bool {
   id = "inventory.items.clear",
   name = "Clear inventory",
   desc = "Clear inventory before giving new items",
@@ -479,7 +479,7 @@ InventoryItemsClear = PowerSettings.entitySchema.bool {
   default = false
 }
 
-InventoryItemsGive = PowerSettings.entitySchema.list.entity {
+Inventory_Items_Give = PowerSettings.entitySchema.list.entity {
   id = "inventory.items.give",
   name = "Give items",
   desc = "Add more items",
@@ -501,7 +501,7 @@ Health = PowerSettings.group {
 
 --#region HEALTH SETTINGS
 
-HealthAmount = PowerSettings.entitySchema.number {
+Health_Amount = PowerSettings.entitySchema.number {
   id = "health.amount",
   name = "Amount of health",
   desc = "The total amount of health to use.",
@@ -513,7 +513,7 @@ HealthAmount = PowerSettings.entitySchema.number {
   format = healthAmountFormat
 }
 
-HealthUse = PowerSettings.entitySchema.bool {
+Health_Use = PowerSettings.entitySchema.bool {
   id = "health.use",
   name = "Use these settings",
   desc = "Whether or not the below settings should apply.",
@@ -522,7 +522,7 @@ HealthUse = PowerSettings.entitySchema.bool {
   default = false
 }
 
-HealthHearts = PowerSettings.entitySchema.number {
+Health_Hearts = PowerSettings.entitySchema.number {
   id = "health.hearts",
   name = "Starting health",
   desc = "The number of half-hearts to start with.",
@@ -534,7 +534,7 @@ HealthHearts = PowerSettings.entitySchema.number {
   visibleIf = isAdvanced
 }
 
-HealthContainers = PowerSettings.entitySchema.number {
+Health_Containers = PowerSettings.entitySchema.number {
   id = "health.containers",
   name = "Health containers",
   desc = "The number of half-heart containers to start with.",
@@ -548,7 +548,7 @@ HealthContainers = PowerSettings.entitySchema.number {
   visibleIf = isAdvanced
 }
 
-HealthCursed = PowerSettings.entitySchema.number {
+Health_Cursed = PowerSettings.entitySchema.number {
   id = "health.cursed",
   name = "Cursed health",
   desc = "The number of half-cursed hearts to start with.",
@@ -562,7 +562,7 @@ HealthCursed = PowerSettings.entitySchema.number {
   visibleIf = isAdvancedAndAmplified
 }
 
-HealthLimit = PowerSettings.entitySchema.number {
+Health_Limit = PowerSettings.entitySchema.number {
   id = "health.limit",
   name = "Health limit",
   desc = "The number of half-hearts the player may ever hold.",
@@ -585,7 +585,7 @@ Other = PowerSettings.group {
   order = 5
 }
 
-OtherMapgen = PowerSettings.entitySchema.bitflag {
+Other_MapGen = PowerSettings.entitySchema.bitflag {
   id = "other.mapGen",
   name = "Map gen for",
   desc = "Whose map gen should be used?",
