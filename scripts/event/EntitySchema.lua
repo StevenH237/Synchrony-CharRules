@@ -292,49 +292,49 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
 
   rule = getTristateSetting("inventory.bans.cirt")
   if rule == CREnum.Tristate.YES then
-    comps.consumableIgnoreRhythmTemporarily = ItemBan.Type.GENERATION_FULL
+    comps.consumableIgnoreRhythmTemporarily = ItemBan.Type.GENERATION_ALL
   else
     comps.consumableIgnoreRhythmTemporarily = nil
   end
 
   rule = getTristateSetting("inventory.bans.healthlocked")
   if rule == CREnum.Tristate.YES then
-    comps.itemBanHealthlocked = ItemBan.Type.GENERATION_FULL
+    comps.itemBanHealthlocked = ItemBan.Type.GENERATION_ALL
   else
     comps.itemBanHealthlocked = nil
   end
 
   rule = getTristateSetting("inventory.bans.noDamage")
   if rule == CREnum.Tristate.YES then
-    comps.itemBanNoDamage = ItemBan.Type.GENERATION_FULL
+    comps.itemBanNoDamage = ItemBan.Type.GENERATION_ALL
   else
     comps.itemBanNoDamage = nil
   end
 
   rule = getTristateSetting("inventory.bans.pacifist")
   if rule == CREnum.Tristate.YES then
-    comps.itemBanPacifist = ItemBan.Type.GENERATION_FULL
+    comps.itemBanPacifist = ItemBan.Type.GENERATION_ALL
   else
     comps.itemBanPacifist = nil
   end
 
   rule = getTristateSetting("inventory.bans.poverty")
   if rule == CREnum.Tristate.YES then
-    comps.itemBanPoverty = ItemBan.Type.GENERATION_FULL
+    comps.itemBanPoverty = ItemBan.Type.GENERATION_ALL
   else
     comps.itemBanPoverty = nil
   end
 
   rule = getTristateSetting("inventory.bans.weaponlocked")
   if rule == CREnum.Tristate.YES then
-    comps.itemBanWeaponlocked = ItemBan.Type.GENERATION_FULL
+    comps.itemBanWeaponlocked = ItemBan.Type.GENERATION_ALL
   else
     comps.itemBanWeaponlocked = nil
   end
 
   rule = getTristateSetting("inventory.bans.grooveChainImmunity")
   if rule == CREnum.Tristate.YES then
-    comps.itemGrooveChainImmunity = ItemBan.Type.GENERATION_FULL
+    comps.itemGrooveChainImmunity = ItemBan.Type.GENERATION_ALL
   else
     comps.itemGrooveChainImmunity = nil
   end
