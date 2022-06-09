@@ -365,7 +365,7 @@ Characters_ParityMovement = PowerSettings.entitySchema.enum {
   desc = "Enemies move at normal tempo",
   order = 63,
   enum = CREnum.Quatristate,
-  default = CREnum.Quatristate,DEFAULT,
+  default = CREnum.Quatristate.DEFAULT,
   visibleIf = isSynchrony
 }
 

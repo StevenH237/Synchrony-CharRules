@@ -203,6 +203,13 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
   elseif CRSettings.get("characters.customTempo") == 1 then
     entity.rhythmSubdivision = false
   end
+
+  rule = CRSettings.get("characters.parityMovement")
+  if rule == CREnum.Tristate.YES then
+    entity.Proto_parityActivation = entity.Proto_parityActivation or {}
+  elseif rule == CREnum.Tristate.NO then
+    entity.Proto_parityActivation = false
+  end
   --#endregion
 
   --#region Bard's settings
