@@ -1,17 +1,11 @@
-local Action          = require "necro.game.system.Action"
-local Event           = require "necro.event.Event"
-local ItemBan         = require "necro.game.item.ItemBan"
-local LevelExit       = require "necro.game.tile.LevelExit"
-local RNG             = require "necro.game.system.RNG"
-local SettingsStorage = require "necro.config.SettingsStorage"
+local Event     = require "necro.event.Event"
+local ItemBan   = require "necro.game.item.ItemBan"
+local LevelExit = require "necro.game.tile.LevelExit"
+local RNG       = require "necro.game.system.RNG"
 
 local CRSettings = require "CharRules.CRSettings"
 local CREnum     = require "CharRules.CREnum"
 local CRSchema   = require "CharRules.CROldEntitySchema"
-
-local CSILoaded = pcall(require, "ControlledStartingInventory.CSISettings")
-
-local PowerSettings = require "PowerSettings.PowerSettings"
 
 ------------------
 -- RNG CHANNELS --
