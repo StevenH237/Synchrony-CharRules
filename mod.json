@@ -1,6 +1,6 @@
 {
 	"name": "CharRules",
-	"displayName": "Char Rules",
+	"displayName": "Character Rules",
 	"version": "3.0.0",
 	"synchronyVersion": "0.50.2",
 	"description": "Modifies gameplay rules using options for individual characters' rules.",
