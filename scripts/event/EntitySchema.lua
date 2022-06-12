@@ -3,9 +3,9 @@ local ItemBan   = require "necro.game.item.ItemBan"
 local LevelExit = require "necro.game.tile.LevelExit"
 local RNG       = require "necro.game.system.RNG"
 
-local CRSettings = require "CharRules.CRSettings"
-local CREnum     = require "CharRules.CREnum"
-local CRSchema   = require "CharRules.CROldEntitySchema"
+local CRSettings = require "CharRules.Settings"
+local CREnum     = require "CharRules.Enum"
+local CRSchema   = require "CharRules.Schema"
 
 ------------------
 -- RNG CHANNELS --

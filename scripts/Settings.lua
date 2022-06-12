@@ -9,7 +9,7 @@ local SettingsStorage = require "necro.config.SettingsStorage"
 
 local PowerSettings = require "PowerSettings.PowerSettings"
 
-local CREnum = require "CharRules.CREnum"
+local CREnum = require "CharRules.Enum"
 
 local NixLib = require "NixLib.NixLib"
 

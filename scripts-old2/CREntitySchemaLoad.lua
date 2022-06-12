@@ -4,8 +4,8 @@ local ItemBan         = require "necro.game.item.ItemBan"
 local LevelExit       = require "necro.game.tile.LevelExit"
 local SettingsStorage = require "necro.config.SettingsStorage"
 
-local CRSettings = require "CharRules.CRSettings"
-local CREnum     = require "CharRules.CREnum"
+local CRSettings = require "CharRules.Settings"
+local CREnum     = require "CharRules.Enum"
 
 local CSILoaded = pcall(require, "ControlledStartingInventory.CSISettings")
 
@@ -13,7 +13,7 @@ local CSILoaded = pcall(require, "ControlledStartingInventory.CSISettings")
 -- EVENTS --
 --#region---
 
-Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, function(ev)
+Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides" }, function(ev)
   local isAdvanced = SettingsStorage.get("config.showAdvanced")
   local entity = ev.entity
   local useItemBans = CRSettings.get("generic.inventory.bans.enable")
@@ -48,7 +48,7 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
   end
 
   --#region ITEM BAN SETTINGS--
-  entity.inventoryBannedItems = entity.inventoryBannedItems or {components={}}
+  entity.inventoryBannedItems = entity.inventoryBannedItems or { components = {} }
   if useItemBans then
     entity.inventoryBannedItems.components = {}
     entity.inventoryBannedItems.components.item = CRSettings.get("generic.inventory.bans.item")
@@ -127,7 +127,7 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
   end
 
   local sarcStairLock = CRSettings.get("character.aria.bypassStairLock")
-  entity.bypassStairLock = entity.bypassStairLock or {level=0}
+  entity.bypassStairLock = entity.bypassStairLock or { level = 0 }
   if sarcStairLock == CREnum.Tristate.NO and entity.bypassStairLock then
     entity.bypassStairLock.level = bit.band(entity.bypassStairLock.level, bit.bnot(LevelExit.StairLock.SARCOPHAGUS))
   elseif sarcStairLock == CREnum.Tristate.YES then
@@ -193,9 +193,9 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
   --#region DOVE SETTINGS--
   local songEndSuicide = CRSettings.get("character.dove.songEndCast")
   if songEndSuicide == CREnum.Tristate.NO then
-    entity.songEndCast = {spell="SpellcastSongEnd"}
+    entity.songEndCast = { spell = "SpellcastSongEnd" }
   elseif songEndSuicide == CREnum.Tristate.YES then
-    entity.songEndCast = {spell="SpellcastSuicide"}
+    entity.songEndCast = { spell = "SpellcastSuicide" }
   end
 
   local teleportingBombs = CRSettings.get("character.dove.teleportingBombs")

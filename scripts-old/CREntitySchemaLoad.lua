@@ -3,7 +3,7 @@ local Event     = require "necro.event.Event"
 local ItemBan   = require "necro.game.item.ItemBan"
 local LevelExit = require "necro.game.tile.LevelExit"
 
-local CRSettings          = require "CharRules.CRSettings"
+local CRSettings          = require "CharRules.Settings"
 local CRInventoryModifier = require "CharRules.CRInventoryModifier"
 
 local CSILoaded, CSISettings = pcall(require, "ControlledStartingInventory.CSISettings")
@@ -12,11 +12,8 @@ local CSILoaded, CSISettings = pcall(require, "ControlledStartingInventory.CSISe
 -- TABLES --
 --#region---
 
-local invStartMode,  invStartAdd,  invStartRemove,
-       invBansMode,   invBansAdd,   invBansRemove,
-     invCursedMode, invCursedAdd, invCursedRemove
-local visibleComponents, monocleMode,
-      telepathyMode, trapsightMode
+local invStartMode, invStartAdd, invStartRemove, invBansMode, invBansAdd, invBansRemove, invCursedMode, invCursedAdd, invCursedRemove
+local visibleComponents, monocleMode, telepathyMode, trapsightMode
 
 --#endregion
 
@@ -24,7 +21,7 @@ local visibleComponents, monocleMode,
 -- EVENTS --
 --#region---
 
-Event.entitySchemaGenerate.add("charRulesFunctions", {order="components", sequence=-1}, function ()
+Event.entitySchemaGenerate.add("charRulesFunctions", { order = "components", sequence = -1 }, function()
   invStartMode, invStartAdd, invStartRemove = CRInventoryModifier.inventoryList(CRSettings.get("inv.start"))
   invBansMode, invBansAdd, invBansRemove = CRInventoryModifier.inventoryList(CRSettings.get("inv.bans"))
   invCursedMode, invCursedAdd, invCursedRemove = CRInventoryModifier.inventoryList(CRSettings.get("inv.cursed"))
@@ -37,7 +34,8 @@ Event.entitySchemaGenerate.add("charRulesFunctions", {order="components", sequen
     for i, v in ipairs(invBansAdd) do
       local k, v2 = string.match(v, "^([^:]+):(.+)$")
       if k then bansAddSet[k] = tonumber(v2)
-      else bansAddSet[v] = ItemBan.Flag.GENERATE_ITEM_POOL + ItemBan.Flag.GENERATE_LEVEL + ItemBan.Flag.GENERATE_TRANSACTION + ItemBan.Flag.GENERATE_SHRINE_POOL + ItemBan.Flag.PICKUP end
+      else bansAddSet[v] = ItemBan.Flag.GENERATE_ITEM_POOL + ItemBan.Flag.GENERATE_LEVEL +
+          ItemBan.Flag.GENERATE_TRANSACTION + ItemBan.Flag.GENERATE_SHRINE_POOL + ItemBan.Flag.PICKUP end
     end
   end
 
@@ -60,7 +58,7 @@ Event.entitySchemaGenerate.add("charRulesFunctions", {order="components", sequen
   trapsightMode = CRSettings.get("misc.vision.component.trapsight")
 end)
 
-Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, function(ev)
+Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides" }, function(ev)
   local entity = ev.entity
 
   --#region NOT SETTINGS --
@@ -77,7 +75,7 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
     entity.CharRules_visibleCustom = {}
   end
 
-  if visibleComponents ~= nil then    
+  if visibleComponents ~= nil then
     for i, v in ipairs(visibleComponents) do
       if entity[v] then
         entity.CharRules_visibleCustom = {}
@@ -165,7 +163,7 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
         for i2, v2 in ipairs(invStartRemove) do
           if v2:sub(-1) == "*" then
             -- If it ends in asterisk, treat it as a prefix
-            if v:sub(1, v2:len()-1) == v2:sub(1, -2) then goto invStartContinue end
+            if v:sub(1, v2:len() - 1) == v2:sub(1, -2) then goto invStartContinue end
           else
             -- Otherwise treat it as an exact ID
             if v == v2 then goto invStartContinue end
@@ -189,7 +187,7 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
 
   if invBansMode then
     local bans = entity.inventoryBannedItems or {}
-    
+
     if invBansMode == "replace" then bans.components = invBansAdd
     else
       bans.components = bans.components or {}
@@ -216,7 +214,7 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
 
   if invCursedMode then
     local curses = entity.inventoryCursedSlots or {}
-    
+
     if invCursedMode == "replace" then curses.slots = invCursedAdd
     else
       curses.slots = curses.slots or {}
@@ -328,10 +326,12 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
 
     if goldKill == 1 then
       currencyBan = bit.bor(currencyBan, ItemBan.Flag.PICKUP_DEATH)
-      goldRingBan = bit.bor(goldRingBan, ItemBan.Flag.GENERATE_ITEM_POOL + ItemBan.Flag.GENERATE_LEVEL + ItemBan.Flag.GENERATE_TRANSACTION)
+      goldRingBan = bit.bor(goldRingBan,
+        ItemBan.Flag.GENERATE_ITEM_POOL + ItemBan.Flag.GENERATE_LEVEL + ItemBan.Flag.GENERATE_TRANSACTION)
     else
       currencyBan = bit.band(currencyBan, bit.bnot(ItemBan.Flag.PICKUP_DEATH))
-      goldRingBan = bit.band(goldRingBan, bit.bnot(ItemBan.Flag.GENERATE_ITEM_POOL + ItemBan.Flag.GENERATE_LEVEL + ItemBan.Flag.GENERATE_TRANSACTION))
+      goldRingBan = bit.band(goldRingBan,
+        bit.bnot(ItemBan.Flag.GENERATE_ITEM_POOL + ItemBan.Flag.GENERATE_LEVEL + ItemBan.Flag.GENERATE_TRANSACTION))
     end
 
     if currencyBan == 0 then currencyBan = nil end
@@ -371,8 +371,8 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
     -- defining it like this to not override other-mod flyaway texts
     local countdownFlyaways = entity.damageCountdownFlyaways or {}
     local countdownTexts = countdownFlyaways.texts or {}
-    for i = 0, 5 do countdownTexts[i+1] = tostring(i) end
-    for i = 10, 50, 10 do countdownTexts[i+1] = tostring(i) end
+    for i = 0, 5 do countdownTexts[i + 1] = tostring(i) end
+    for i = 10, 50, 10 do countdownTexts[i + 1] = tostring(i) end
     countdownFlyaways.texts = countdownTexts
     entity.damageCountdownFlyaways = countdownFlyaways
   elseif countdownActive == -1 then
@@ -399,10 +399,10 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
     local dirs = CRSettings.getAllowedActions()
     local filter = entity.actionFilter or {}
     local ignored = filter.ignoreActions or {
-      [Action.Direction.UP_RIGHT]=true,
-      [Action.Direction.UP_LEFT]=true,
-      [Action.Direction.DOWN_LEFT]=true,
-      [Action.Direction.DOWN_RIGHT]=true
+      [Action.Direction.UP_RIGHT] = true,
+      [Action.Direction.UP_LEFT] = true,
+      [Action.Direction.DOWN_LEFT] = true,
+      [Action.Direction.DOWN_RIGHT] = true
     }
 
     for i = 1, 14 do
@@ -425,7 +425,7 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
     local miniboss = CRSettings.get("misc.exits.miniboss")
     local sarcophagus = CRSettings.get("misc.exits.sarcophagus")
 
-    local exitStairLock = entity.bypassStairLock or {level=0}
+    local exitStairLock = entity.bypassStairLock or { level = 0 }
     local exitLevel = exitStairLock.level or 2
 
     if miniboss == -1 then
@@ -460,7 +460,7 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
     if lamb == -1 then
       entity.characterWithFollower = false
     elseif lamb == 1 then
-      entity.characterWithFollower = {followerType="Marv"}
+      entity.characterWithFollower = { followerType = "Marv" }
     end
   end
 
@@ -478,9 +478,9 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
     local useComponents = CRSettings.get("misc.vision.component.use")
 
     if useComponents then
-      entity.forceObjectVision = {component="CharRules_visibleCustom"}
-      entity.minimapVision = {component="CharRules_visibleCustom"}
-      entity.forceNonSilhouetteVision = {component="CharRules_visibleCustom"}
+      entity.forceObjectVision = { component = "CharRules_visibleCustom" }
+      entity.minimapVision = { component = "CharRules_visibleCustom" }
+      entity.forceNonSilhouetteVision = { component = "CharRules_visibleCustom" }
     end
 
     local objectLimit = CRSettings.get("misc.vision.objectLimit")
@@ -501,7 +501,7 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", {order="overrides"}, fun
   end
 
   --#endregion
-  
+
   --#endregion
 end)
 
