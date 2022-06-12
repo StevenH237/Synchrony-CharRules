@@ -31,6 +31,20 @@ local ItemBanFlags = ItemBan.Flag.PICKUP
 --#endregion Constants
 
 ---------------
+-- VARIABLES --
+--#region------
+
+local MapGenRules = {
+  bossSarcophagus  = nil,
+  innatePeace      = nil,
+  noGoldInVaults   = nil,
+  reverseZoneOrder = nil,
+  skipBosses       = nil,
+  smallerShops     = nil,
+  storyBosses      = nil
+}
+
+---------------
 -- FUNCTIONS --
 --#region------
 
@@ -64,6 +78,17 @@ Event.entitySchemaGenerate.add("checks", { order = "components", sequence = -1 }
     state1 = 237,
     state2 = 794824,
     state3 = CRSettings.get("random")
+  }
+
+  -- We'll do map gen rule calls *here* so that all characters are consistent
+  MapGenRules = {
+    bossSarcophagus  = getTristate("mapGen.bossSarcophagus"),
+    innatePeace      = getTristate("mapGen.innatePeace"),
+    noGoldInVaults   = getTristate("mapGen.noGoldInVaults"),
+    reverseZoneOrder = getTristate("mapGen.reverseZoneOrder"),
+    skipBosses       = getTristate("mapGen.skipBosses"),
+    smallerShops     = getTristate("mapGen.smallerShops"),
+    storyBosses      = getTristate("mapGen.skipBosses")
   }
 end)
 
@@ -453,9 +478,41 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
   end
   --#endregion
 
-  --#region Other
-  if CRSettings.get("other.mapGen") ~= 0 then
-    entity.playerCharacterLevelGenerationTraits = { mask = CRSettings.get("other.mapGen") }
+  --#region Map gen
+  if MapGenRules.bossSarcophagus == Tristate.YES then
+    entity.traitBossSarcophagus = entity.traitBossSarcophagus or {}
+  elseif MapGenRules.bossSarcophagus == Tristate.NO then
+    entity.traitBossSarcophagus = false
+  end
+
+  if MapGenRules.innatePeace == Tristate.YES then
+    entity.traitInnatePeace = entity.traitInnatePeace or {}
+  elseif MapGenRules.innatePeace == Tristate.NO then
+    entity.traitInnatePeace = false
+  end
+
+  if MapGenRules.noGoldInVaults == Tristate.YES then
+    entity.traitNoGoldInVaults = entity.traitNoGoldInVaults or {}
+  elseif MapGenRules.noGoldInVaults == Tristate.NO then
+    entity.traitNoGoldInVaults = false
+  end
+
+  if MapGenRules.reverseZoneOrder == Tristate.YES then
+    entity.traitReverseZoneOrder = entity.traitReverseZoneOrder or {}
+  elseif MapGenRules.reverseZoneOrder == Tristate.NO then
+    entity.traitReverseZoneOrder = false
+  end
+
+  if MapGenRules.skipBosses == Tristate.YES then
+    entity.traitSkipBosses = entity.traitSkipBosses or {}
+  elseif MapGenRules.skipBosses == Tristate.NO then
+    entity.traitSkipBosses = false
+  end
+
+  if MapGenRules.smallerShops == Tristate.YES then
+    entity.traitSmallerShops = entity.traitSmallerShops or {}
+  elseif MapGenRules.smallerShops == Tristate.NO then
+    entity.traitSmallerShops = false
   end
   --#endregion
 end)

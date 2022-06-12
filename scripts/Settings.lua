@@ -119,7 +119,8 @@ PowerSettings.entitySchema.bool {
   id = "advanced",
   name = "Advanced mode",
   desc = "Should this mod show advanced settings?",
-  order = 0
+  order = 0,
+  refreshOnChange = true
 }
 
 PowerSettings.group {
@@ -773,22 +774,76 @@ PowerSettings.entitySchema.number {
 --#endregion
 
 PowerSettings.group {
-  id = "other",
-  name = "Other",
-  desc = "Other stuff",
-  order = 5
+  id = "mapGen",
+  name = "Map generation settings",
+  desc = "Settings that affect map generation",
+  order = 5,
+  visibleIf = isAdvanced
 }
 
-PowerSettings.entitySchema.bitflag {
-  id = "other.mapGen",
-  name = "Map gen for",
-  desc = "Whose map gen should be used?",
+--#region Map gen settings
+
+PowerSettings.entitySchema.enum {
+  id = "mapGen.bossSarcophagus",
+  name = "Sarcophagus in every room",
+  desc = "Whether an invulnerable sarcophagus should be placed in (almost) every room.",
   order = 0,
-  visibleIf = isAdvanced,
-  default = CREnum.MapGen.DEFAULT,
-  flags = CREnum.MapGen,
-  presets = CREnum.MapGenPresets
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT,
+  visibleIf = isAdvanced
 }
+
+PowerSettings.entitySchema.enum {
+  id = "mapGen.innatePeace",
+  name = "Innate peace",
+  desc = "Reduces the enemies in each floor",
+  order = 1,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT,
+  visibleIf = isAdvanced
+}
+
+PowerSettings.entitySchema.enum {
+  id = "mapGen.noGoldInVaults",
+  name = "Skip gold in vaults",
+  desc = "Whether or not gold in vaults and walls should be skipped.",
+  order = 2,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT,
+  visibleIf = isAdvanced
+}
+
+PowerSettings.entitySchema.enum {
+  id = "mapGen.reverseZoneOrder",
+  name = "Reverse zone order",
+  desc = "Whether or not the zone order should be reversed.",
+  order = 3,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT,
+  visibleIf = isAdvanced
+}
+
+PowerSettings.entitySchema.enum {
+  id = "mapGen.skipBosses",
+  name = "Skip boss fights",
+  desc = "Whether or not boss fights should be skipped.",
+  order = 4,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT,
+  visibleIf = isAdvanced
+}
+
+PowerSettings.entitySchema.enum {
+  id = "mapGen.smallerShops",
+  name = "Smaller shops",
+  desc = "Remove an item from the shops.",
+  order = 5,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT,
+  visibleIf = isAdvanced
+}
+
+--#endregion
 
 --#endregion
 
