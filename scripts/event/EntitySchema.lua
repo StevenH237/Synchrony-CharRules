@@ -7,6 +7,8 @@ local CRSettings = require "CharRules.Settings"
 local CREnum     = require "CharRules.Enum"
 local CRSchema   = require "CharRules.Schema"
 
+local Tristate = CREnum.Tristate
+
 ------------------
 -- RNG CHANNELS --
 --#region---------
@@ -48,23 +50,21 @@ local MapGenRules = {
 -- FUNCTIONS --
 --#region------
 
-local function getTristate(quat)
+local function getTristate(setting)
+  local quat = CRSettings.get(setting)
+
   -- We're gonna use an rng call no matter what, so that the randomization isn't determined by which settings are set to random.
-  local randomTristate = RNG.choice({ CREnum.Tristate.NO, CREnum.Tristate.DEFAULT, CREnum.Tristate.YES }, RNGChannel)
+  local randomTristate = RNG.choice({ Tristate.NO, Tristate.DEFAULT, Tristate.YES }, RNGChannel)
 
   if quat == CREnum.Quatristate.NO then
-    return CREnum.Tristate.NO
+    return Tristate.NO
   elseif quat == CREnum.Quatristate.DEFAULT then
-    return CREnum.Tristate.DEFAULT
+    return Tristate.DEFAULT
   elseif quat == CREnum.Quatristate.YES then
-    return CREnum.Tristate.YES
+    return Tristate.YES
   else
     return randomTristate
   end
-end
-
-local function getTristateSetting(setting)
-  return getTristate(CRSettings.get(setting))
 end
 
 --#endregion
@@ -105,8 +105,8 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
 
   --#region Character-specific rules
   --#region Aria's rules
-  local rule = getTristateSetting("characters.missedBeat")
-  if rule == CREnum.Tristate.YES then
+  local rule = getTristate("characters.missedBeat")
+  if rule == Tristate.YES then
     entity.grooveChainInflictDamageOnDrop = entity.grooveChainInflictDamageOnDrop or {}
     entity.grooveChainInflictDamageOnDrop.active = true
 
@@ -116,23 +116,23 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
     if dmg > 0 then
       entity.grooveChainInflictDamageOnDrop.damage = dmg
     end
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     entity.grooveChainInflictDamageOnDrop = false
   end
 
-  rule = getTristateSetting("characters.bypassSarcophagus")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("characters.bypassSarcophagus")
+  if rule == Tristate.YES then
     entity.bypassStairLock = entity.bypassStairLock or { level = 0 }
     entity.bypassStairLock.level = bit.bor(entity.bypassStairLock.level, LevelExit.StairLock.SARCOPHAGUS)
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     entity.bypassStairLock = entity.bypassStairLock or { level = 0 }
     entity.bypassStairLock.level = bit.band(entity.bypassStairLock.level, bit.bnot(LevelExit.StairLock.SARCOPHAGUS))
   end
   --#endregion
 
   --#region Dorian's Rules
-  rule = getTristateSetting("characters.cursedBoots")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("characters.cursedBoots")
+  if rule == Tristate.YES then
     entity.takeDamageOnUntoggledMovement = entity.takeDamageOnUntoggledMovement or {}
 
     entity.takeDamageOnUntoggledMovement.type = CRSettings.get("characters.cursedBootsType")
@@ -141,67 +141,67 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
     if dmg > 0 then
       entity.takeDamageOnUntoggledMovement.damage = dmg
     end
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     entity.takeDamageOnUntoggledMovement = false
   end
   --#endregion
 
   --#region Eli's Rules
-  rule = getTristateSetting("characters.eliWalls")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("characters.eliWalls")
+  if rule == Tristate.YES then
     entity.wallDropSuppressor = entity.wallDropSuppressor or {}
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     entity.wallDropSuppressor = false
   end
   --#endregion
 
   --#region Monk's Rules
-  rule = getTristateSetting("characters.poverty")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("characters.poverty")
+  if rule == Tristate.YES then
     entity.inventoryBannedItems.components.itemCurrency = ItemBan.Flag.PICKUP_DEATH
     entity.inventoryBannedItems.components.itemBanPoverty = ItemBan.Flag.GENERATION
     entity.goldHater = entity.goldHater or {}
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     entity.inventoryBannedItems.components.itemCurrency = 0
     entity.inventoryBannedItems.components.itemBanPoverty = 0
     entity.goldHater = false
   end
 
-  rule = getTristateSetting("characters.shoplifter")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("characters.shoplifter")
+  if rule == Tristate.YES then
     entity.shoplifter = entity.shoplifter or {}
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     entity.shoplifter = false
   end
 
-  rule = getTristateSetting("characters.descentCollect")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("characters.descentCollect")
+  if rule == Tristate.YES then
     entity.descentCollectCurrency = entity.descentCollectCurrency or {}
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     entity.descentCollectCurrency = false
   end
 
-  rule = getTristateSetting("characters.enemyGold")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("characters.enemyGold")
+  if rule == Tristate.YES then
     entity.minimumCurrencyDrop = entity.minimumCurrencyDrop or { minimum = 1 }
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     entity.minimumCurrencyDrop = false
   end
   --#endregion
 
   --#region Dove's rules
-  rule = getTristateSetting("characters.teleportingBombs")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("characters.teleportingBombs")
+  if rule == Tristate.YES then
     entity.teleportingBombs = entity.teleportingBombs or {}
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     entity.teleportingBombs = false
   end
 
-  rule = getTristateSetting("characters.bypassMiniboss")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("characters.bypassMiniboss")
+  if rule == Tristate.YES then
     entity.bypassStairLock = entity.bypassStairLock or { level = 0 }
     entity.bypassStairLock.level = bit.bor(entity.bypassStairLock.level, LevelExit.StairLock.MINIBOSS)
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     entity.bypassStairLock = entity.bypassStairLock or { level = 0 }
     entity.bypassStairLock.level = bit.band(entity.bypassStairLock.level, bit.bnot(LevelExit.StairLock.MINIBOSS))
   end
@@ -209,10 +209,10 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
 
   --#region Bolt's settings
   rule = CRSettings.get("characters.doubleTime")
-  if rule == CREnum.Tristate.YES then
+  if rule == Tristate.YES then
     entity.rhythmSubdivision = entity.rhythmSubdivision or {}
     entity.rhythmSubdivision.factor = 2
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     entity.rhythmSubdivision = false
   end
 
@@ -224,20 +224,20 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
   end
 
   rule = CRSettings.get("characters.parityMovement")
-  if rule == CREnum.Tristate.YES then
+  if rule == Tristate.YES then
     entity.Proto_parityActivation = entity.Proto_parityActivation or {}
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     entity.Proto_parityActivation = false
   end
   --#endregion
 
   --#region Bard's settings
   rule = CRSettings.get("characters.noBeats")
-  if rule == CREnum.Tristate.YES then
+  if rule == Tristate.YES then
     entity.rhythmIgnored = entity.rhythmIgnored or {}
     entity.rhythmIgnoredTemporarily = false
     entity.inventoryBannedItems.components.consumableIgnoreRhythmTemporarily = ItemBan.Type.GENERATION
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     entity.rhythmIgnored = false
     entity.rhythmIgnoredTemporarily = entity.rhythmIgnoredTemporarily or {}
     entity.inventoryBannedItems.components.consumableIgnoreRhythmTemporarily = 0
@@ -246,9 +246,9 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
 
   --#region Mary's settings
   rule = CRSettings.get("characters.marv")
-  if rule == CREnum.Tristate.YES then
+  if rule == Tristate.YES then
     entity.characterWithFollower = { followerType = "Marv" }
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     if entity.characterWithFollower and entity.characterWithFollower.followerType == "Marv" then
       entity.characterWithFollower = false
     end
@@ -257,17 +257,17 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
 
   --#region Tempo's settings
   rule = CRSettings.get("characters.damageUp")
-  if rule == CREnum.Tristate.YES then
+  if rule == Tristate.YES then
     entity.damageIncrease = entity.damageIncrease or { damage = 999 }
     if CRSettings.get("characters.damageUpAmount") > 0 then
       entity.damageIncrease.damage = CRSettings.get("characters.damageUpAmount")
     end
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     entity.damageIncrease = {}
   end
 
   rule = CRSettings.get("characters.killTimer")
-  if rule == CREnum.Tristate.YES then
+  if rule == Tristate.YES then
     entity.damageCountdown = entity.damageCountdown or {}
     entity.damageCountdown.countdownReset = entity.damageCountdown.countdownReset or 17
     entity.damageCountdown.damage = entity.damageCountdown.damage or 999
@@ -284,7 +284,7 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
         [11] = "10"
       }
     }
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     entity.damageCountdown = false
     entity.soundDamageCountdown = false
     entity.damageCountdownFlyaways = false
@@ -331,52 +331,52 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
   local banFlags = entity.inventoryBannedItems or { components = {} }
   local comps = banFlags.components
 
-  rule = getTristateSetting("inventory.bans.cirt")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.bans.cirt")
+  if rule == Tristate.YES then
     comps.consumableIgnoreRhythmTemporarily = ItemBanFlags
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     comps.consumableIgnoreRhythmTemporarily = nil
   end
 
-  rule = getTristateSetting("inventory.bans.healthlocked")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.bans.healthlocked")
+  if rule == Tristate.YES then
     comps.itemBanHealthlocked = ItemBanFlags
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     comps.itemBanHealthlocked = nil
   end
 
-  rule = getTristateSetting("inventory.bans.noDamage")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.bans.noDamage")
+  if rule == Tristate.YES then
     comps.itemBanNoDamage = ItemBanFlags
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     comps.itemBanNoDamage = nil
   end
 
-  rule = getTristateSetting("inventory.bans.pacifist")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.bans.pacifist")
+  if rule == Tristate.YES then
     comps.itemBanPacifist = ItemBanFlags
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     comps.itemBanPacifist = nil
   end
 
-  rule = getTristateSetting("inventory.bans.poverty")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.bans.poverty")
+  if rule == Tristate.YES then
     comps.itemBanPoverty = ItemBanFlags
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     comps.itemBanPoverty = nil
   end
 
-  rule = getTristateSetting("inventory.bans.weaponlocked")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.bans.weaponlocked")
+  if rule == Tristate.YES then
     comps.itemBanWeaponlocked = ItemBanFlags
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     comps.itemBanWeaponlocked = nil
   end
 
-  rule = getTristateSetting("inventory.bans.grooveChainImmunity")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.bans.grooveChainImmunity")
+  if rule == Tristate.YES then
     comps.itemGrooveChainImmunity = ItemBanFlags
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     comps.itemGrooveChainImmunity = nil
   end
 
@@ -387,73 +387,73 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
   local cursedSlots = entity.inventoryCursedSlots or { slots = {} }
   local slots = cursedSlots.slots
 
-  rule = getTristateSetting("inventory.curses.action")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.curses.action")
+  if rule == Tristate.YES then
     slots.action = true
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     slots.action = nil
   end
 
-  rule = getTristateSetting("inventory.curses.shovel")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.curses.shovel")
+  if rule == Tristate.YES then
     slots.shovel = true
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     slots.shovel = nil
   end
 
-  rule = getTristateSetting("inventory.curses.weapon")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.curses.weapon")
+  if rule == Tristate.YES then
     slots.weapon = true
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     slots.weapon = nil
   end
 
-  rule = getTristateSetting("inventory.curses.body")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.curses.body")
+  if rule == Tristate.YES then
     slots.body = true
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     slots.body = nil
   end
 
-  rule = getTristateSetting("inventory.curses.head")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.curses.head")
+  if rule == Tristate.YES then
     slots.head = true
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     slots.head = nil
   end
 
-  rule = getTristateSetting("inventory.curses.feet")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.curses.feet")
+  if rule == Tristate.YES then
     slots.feet = true
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     slots.feet = nil
   end
 
-  rule = getTristateSetting("inventory.curses.torch")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.curses.torch")
+  if rule == Tristate.YES then
     slots.torch = true
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     slots.torch = nil
   end
 
-  rule = getTristateSetting("inventory.curses.ring")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.curses.ring")
+  if rule == Tristate.YES then
     slots.ring = true
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     slots.ring = nil
   end
 
-  rule = getTristateSetting("inventory.curses.misc")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.curses.misc")
+  if rule == Tristate.YES then
     slots.misc = true
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     slots.misc = nil
   end
 
-  rule = getTristateSetting("inventory.curses.spell")
-  if rule == CREnum.Tristate.YES then
+  rule = getTristate("inventory.curses.spell")
+  if rule == Tristate.YES then
     slots.spell = true
-  elseif rule == CREnum.Tristate.NO then
+  elseif rule == Tristate.NO then
     slots.spell = nil
   end
 
