@@ -843,6 +843,51 @@ PowerSettings.entitySchema.enum {
   visibleIf = isAdvanced
 }
 
+PowerSettings.entitySchema.enum {
+  id = "mapGen.storyBosses",
+  name = "Use story bosses",
+  desc = "Whether or not to face story bosses in the run.",
+  order = 6,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT,
+  visibleIf = isAdvanced,
+  refreshOnChange = true
+}
+
+PowerSettings.entitySchema.list.enum {
+  id = "mapGen.storyBossList",
+  name = "List of bosses",
+  desc = "Which story bosses should be faced at the end?",
+  order = 7,
+  enum = Boss.Type,
+  default = { Boss.Type.NECRODANCER },
+  itemDefault = Boss.Type.NECRODANCER,
+  visibleIf = function() return get("mapGen.storyBosses") == CREnum.Quatristate.RANDOM or
+        get("mapGen.storyBosses") == CREnum.Quatristate.YES
+  end
+}
+
+--#endregion
+
+PowerSettings.group {
+  id = "tweaks",
+  name = "Tweaks",
+  desc = "Various tweaks that aren't exactly rules but might be helpful.",
+  order = 6,
+  visibleIf = isAdvanced
+}
+
+--#region Tweaks
+
+PowerSettings.shared.bool {
+  id = "tweaks.goldenLute",
+  name = "Golden lute damages golden lute",
+  desc = "Should the Golden Lute (boss) take damage from the Golden Lute (weapon)?",
+  order = 1,
+  default = false,
+  visibleIf = isAdvanced
+}
+
 --#endregion
 
 --#endregion
