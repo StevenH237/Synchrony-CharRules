@@ -88,7 +88,7 @@ Event.entitySchemaGenerate.add("checks", { order = "components", sequence = -1 }
     reverseZoneOrder = getTristate("mapGen.reverseZoneOrder"),
     skipBosses       = getTristate("mapGen.skipBosses"),
     smallerShops     = getTristate("mapGen.smallerShops"),
-    storyBosses      = getTristate("mapGen.skipBosses")
+    storyBosses      = getTristate("mapGen.storyBosses"),
   }
 end)
 
@@ -513,6 +513,12 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
     entity.traitSmallerShops = entity.traitSmallerShops or {}
   elseif MapGenRules.smallerShops == Tristate.NO then
     entity.traitSmallerShops = false
+  end
+
+  if MapGenRules.storyBosses == Tristate.YES then
+    entity.traitStoryBosses = { bosses = CRSettings.get("mapGen.storyBossList") }
+  elseif MapGenRules.storyBosses == Tristate.NO then
+    entity.traitStoryBosses = false
   end
   --#endregion
 end)
