@@ -54,43 +54,7 @@ do
   }
 end
 
-module.MapGen = {
-  CADENCE = 1,
-  MELODY = 2,
-  ARIA = 4,
-  DORIAN = 8,
-  ELI = 16,
-  MONK = 32,
-  DOVE = 64,
-  CODA = 128,
-  BOLT = 256,
-  BARD = 512,
-  NOCTURNA = 1024,
-  DIAMOND = 2048,
-  MARY = 4096,
-  TEMPO = 8192,
-  -- REAPER=16384,
-  prettyNames = {
-    [0] = "(Default)",
-    [1] = "Cadence",
-    [2] = "Melody",
-    [4] = "Aria",
-    [8] = "Dorian",
-    [16] = "Eli",
-    [32] = "Monk",
-    [64] = "Dove",
-    [128] = "Coda",
-    [256] = "Bolt",
-    [512] = "Bard",
-    [1024] = "Nocturna",
-    [2048] = "Diamond",
-    [4096] = "Mary",
-    [8192] = "Tempo",
-    -- [16384]="Reaper"
-  }
-}
-
-module.MapGenPresets = {
+module.CharacterBitmask = {
   CADENCE = 1,
   MELODY = 2,
   ARIA = 4,

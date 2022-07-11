@@ -1,5 +1,7 @@
-local Damage = require "necro.game.system.Damage"
-local Event  = require "necro.event.Event"
+local Damage   = require "necro.game.system.Damage"
+local Event    = require "necro.event.Event"
+local Player   = require "necro.game.character.Player"
+local Entities = require "system.game.Entities"
 
 local CRSettings = require "CharRules.Settings"
 

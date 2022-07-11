@@ -1,9 +1,11 @@
 --#region Imports
+local Boss            = require "necro.game.level.Boss"
 local Damage          = require "necro.game.system.Damage"
 local Entities        = require "system.game.Entities"
 local GameDLC         = require "necro.game.data.resource.GameDLC"
 local ItemBan         = require "necro.game.item.ItemBan"
 local Menu            = require "necro.menu.Menu"
+local Progression     = require "necro.game.system.Progression"
 local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
 
@@ -69,22 +71,73 @@ end
 -- ENABLERS --
 --#region-----
 
-local function isAdvanced()
-  return PowerSettings.get("mod.CharRules.advanced")
+-- NOTE: ALL FUNCTIONS IN THIS SECTION RETURN FUNCTIONS
+-- USE visibleIf=funcName(param) IN THE SETTINGS CALL
+
+local function both(a, b)
+  return function()
+    return a() and b()
+  end
 end
 
-local function isAmplified()
-  return GameDLC.isAmplifiedLoaded()
+local function either(a, b)
+  return function()
+    return a() or b()
+  end
 end
 
-local function isAdvancedAndAmplified()
-  return isAdvanced() and isAmplified()
+local function anti(a)
+  return function()
+    return not a()
+  end
 end
 
-local function isSynchrony()
-  -- In the future, this function will only return true if the second DLC
-  -- is loaded.
-  return true
+local function isAdvanced(exp)
+  if exp == nil then exp = true end
+
+  return function()
+    return PowerSettings.get("config.showAdvanced") == exp
+  end
+end
+
+local function isAmplified(exp)
+  if exp == nil then exp = true end
+
+  return function()
+    return GameDLC.isAmplifiedLoaded() == exp
+  end
+end
+
+local function isSynchrony(exp)
+  if exp == nil then exp = true end
+
+  return function()
+    return GameDLC.isSynchronyLoaded()
+  end
+end
+
+local function isCharacterUnlocked(character)
+  return function()
+    return true
+  end
+end
+
+local function anyCharacterLocked()
+  return function()
+    for _, char in ipairs({ "Aria", "Dorian", "Eli", "Monk", "Dove", "Bolt", "Bard" }) do
+      if Progression.isLocked(Progression.UnlockType.PLAYABLE_CHARACTER, char) then
+        return true
+      end
+    end
+
+    if isAmplified() then
+      for _, char in ipairs({ "Mary", "Tempo" }) do
+        if Progression.isLocked(Progression.UnlockType.PLAYABLE_CHARACTER, char) then
+          return true
+        end
+      end
+    end
+  end
 end
 
 --#endregion Enablers
@@ -115,14 +168,6 @@ PowerSettings.entitySchema.number {
   visibility = Settings.Visibility.HIDDEN
 }
 
-PowerSettings.entitySchema.bool {
-  id = "advanced",
-  name = "Advanced mode",
-  desc = "Should this mod show advanced settings?",
-  order = 0,
-  refreshOnChange = true
-}
-
 PowerSettings.group {
   id = "characters",
   name = "Character-specific rules",
@@ -137,12 +182,19 @@ PowerSettings.entitySchema.label {
   order = 0
 }
 
-PowerSettings.entitySchema.action {
+PowerSettings.entitySchema.bool {
+  id = "characters.showAll",
+  name = "Show all characters",
+  desc = "Show rules for all characters, even those not yet unlocked.",
+  order = 1,
+  visibleIf = anyCharacterLocked()
+}
+
+PowerSettings.shared.header {
   id = "characters.aria",
-  name = "\3*cc5Aria's rules\3r",
+  name = "Aria's rules",
   order = 10,
-  leftAction = charJump("tempo", "bard"),
-  rightAction = charJump("dorian")
+  visibleIf = isCharacterUnlocked("Aria")
 }
 
 PowerSettings.entitySchema.enum {
@@ -150,6 +202,7 @@ PowerSettings.entitySchema.enum {
   name = "Damage on missed beat",
   desc = "Whether or not players should take damage on a missed beat.",
   order = 11,
+  visibleIf = isCharacterUnlocked("Aria"),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -159,7 +212,7 @@ PowerSettings.entitySchema.number {
   name = "Amount of damage",
   desc = "The amount of damage on a missed beat.",
   order = 12,
-  visibleIf = isAdvanced,
+  visibleIf = both(isAdvanced(), isCharacterUnlocked("Aria")),
   default = 0,
   minimum = 0,
   maximum = 50,
@@ -171,7 +224,7 @@ PowerSettings.entitySchema.bitflag {
   name = "Type of damage",
   desc = "The type of damage on a missed beat.",
   order = 13,
-  visibleIf = isAdvanced,
+  visibleIf = both(isAdvanced(), isCharacterUnlocked("Aria")),
   default = Damage.Type.SELF_DAMAGE,
   flags = Damage.Flag,
   presets = Damage.Type
@@ -182,17 +235,16 @@ PowerSettings.entitySchema.enum {
   name = "Bypass sarcophagus",
   desc = "Whether or not stairs should be locked until a sarcophagus is destroyed",
   order = 14,
-  visibleIf = isAdvanced,
+  visibleIf = both(isAdvanced(), isCharacterUnlocked("Aria")),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
 
-PowerSettings.entitySchema.action {
+PowerSettings.shared.header {
   id = "characters.dorian",
-  name = "\3*cc5Dorian's rules\3r",
+  name = "Dorian's rules",
   order = 20,
-  leftAction = charJump("aria"),
-  rightAction = charJump("eli")
+  visibleIf = isCharacterUnlocked("Dorian")
 }
 
 PowerSettings.entitySchema.enum {
@@ -200,6 +252,7 @@ PowerSettings.entitySchema.enum {
   name = "Boots of painful leaping",
   desc = "Should boots of leaping or lunging cause damage when disabled while moving",
   order = 21,
+  visibleIf = isCharacterUnlocked("Dorian"),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -207,7 +260,8 @@ PowerSettings.entitySchema.enum {
 PowerSettings.entitySchema.label {
   id = "characters.cursedBootsLabel",
   name = "To actually apply the boots, go to Inventory.",
-  order = 22
+  order = 22,
+  visibleIf = isCharacterUnlocked("Dorian")
 }
 
 PowerSettings.entitySchema.number {
@@ -215,7 +269,7 @@ PowerSettings.entitySchema.number {
   name = "Amount of damage",
   desc = "The amount of damage from cursed boots.",
   order = 23,
-  visibleIf = isAdvanced,
+  visibleIf = both(isAdvanced(), isCharacterUnlocked("Dorian")),
   default = 0,
   minimum = 0,
   maximum = 50,
@@ -227,24 +281,24 @@ PowerSettings.entitySchema.bitflag {
   name = "Type of damage",
   desc = "The type of damage from cursed boots.",
   order = 24,
-  visibleIf = isAdvanced,
+  visibleIf = both(isAdvanced(), isCharacterUnlocked("Dorian")),
   default = Damage.Type.BLOOD,
   flags = Damage.Flag,
   presets = Damage.Type
 }
 
-PowerSettings.entitySchema.action {
+PowerSettings.shared.header {
   id = "characters.eli",
-  name = "\3*cc5Eli's rules\3r",
+  name = "Eli's rules",
   order = 30,
-  leftAction = charJump("dorian"),
-  rightAction = charJump("monk")
+  visibleIf = isCharacterUnlocked("Eli")
 }
 
 PowerSettings.entitySchema.label {
   id = "characters.eliBombs",
   name = "For infinite bombs, go to Inventory.",
-  order = 31
+  order = 31,
+  visibleIf = isCharacterUnlocked("Eli")
 }
 
 PowerSettings.entitySchema.enum {
@@ -252,16 +306,16 @@ PowerSettings.entitySchema.enum {
   name = "Empty shop walls",
   desc = "Should shop walls be devoid of gold?",
   order = 32,
+  visibleIf = isCharacterUnlocked("Eli"),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
 
-PowerSettings.entitySchema.action {
+PowerSettings.shared.header {
   id = "characters.monk",
-  name = "\3*cc5Monk's rules\3r",
+  name = "Monk's rules",
   order = 40,
-  leftAction = charJump("eli"),
-  rightAction = charJump("dove")
+  visibleIf = isCharacterUnlocked("Monk")
 }
 
 PowerSettings.entitySchema.enum {
@@ -269,6 +323,7 @@ PowerSettings.entitySchema.enum {
   name = "Vow of poverty",
   desc = "Die on picking up gold",
   order = 41,
+  visibleIf = isCharacterUnlocked("Monk"),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -278,6 +333,7 @@ PowerSettings.entitySchema.enum {
   name = "Free items from shops",
   desc = "Character receives one free item per shop",
   order = 42,
+  visibleIf = isCharacterUnlocked("Monk"),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -287,6 +343,7 @@ PowerSettings.entitySchema.enum {
   name = "Collect gold on stairs",
   desc = "When descending the stairs, pickup all dropped gold",
   order = 43,
+  visibleIf = isCharacterUnlocked("Monk"),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -296,22 +353,23 @@ PowerSettings.entitySchema.enum {
   name = "All enemies drop gold",
   desc = "All enemies drop at least one gold when killed",
   order = 44,
+  visibleIf = isCharacterUnlocked("Monk"),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
 
-PowerSettings.entitySchema.action {
+PowerSettings.shared.header {
   id = "characters.dove",
-  name = "\3*cc5Dove's rules\3r",
+  name = "Dove's rules",
   order = 50,
-  leftAction = charJump("monk"),
-  rightAction = charJump("bolt")
+  visibleIf = isCharacterUnlocked("Dove")
 }
 
 PowerSettings.entitySchema.label {
   id = "characters.doveLabel",
   name = "For the flower, go to Inventory.",
-  order = 51
+  order = 51,
+  visibleIf = isCharacterUnlocked("Dove")
 }
 
 PowerSettings.entitySchema.enum {
@@ -319,6 +377,7 @@ PowerSettings.entitySchema.enum {
   name = "Teleporting bombs",
   desc = "When enemies are hit by bombs, they're teleported instead of damaged.",
   order = 52,
+  visibleIf = isCharacterUnlocked("Dove"),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -328,26 +387,16 @@ PowerSettings.entitySchema.enum {
   name = "Bypass miniboss",
   desc = "Should minibosses be bypassed for the stairs lock?",
   order = 53,
+  visibleIf = isCharacterUnlocked("Dove"),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
 
-PowerSettings.entitySchema.action {
+PowerSettings.shared.header {
   id = "characters.bolt",
-  name = "\3*cc5Bolt's rules\3r",
+  name = "Bolt's rules",
   order = 60,
-  leftAction = charJump("dove"),
-  rightAction = charJump("bard")
-}
-
-PowerSettings.entitySchema.enum {
-  id = "characters.doubleTime",
-  name = "Double tempo",
-  desc = "Should characters play at double tempo",
-  order = 61,
-  enum = CREnum.Quatristate,
-  default = CREnum.Quatristate.DEFAULT,
-  visibleIf = function() return not isAdvanced() end
+  visibleIf = isCharacterUnlocked("Bolt")
 }
 
 PowerSettings.entitySchema.number {
@@ -359,7 +408,7 @@ PowerSettings.entitySchema.number {
   minimum = 0,
   maximum = 20,
   format = numberFormat(0),
-  visibleIf = isAdvanced
+  visibleIf = isCharacterUnlocked("Bolt")
 }
 
 PowerSettings.entitySchema.enum {
@@ -369,15 +418,14 @@ PowerSettings.entitySchema.enum {
   order = 63,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
-  visibleIf = isSynchrony
+  visibleIf = both(isCharacterUnlocked("Bolt"), isSynchrony()),
+  ignoredIf = isSynchrony(false)
 }
 
-PowerSettings.entitySchema.action {
+PowerSettings.shared.header {
   id = "characters.bard",
-  name = "\3*cc5Bard's rules\3r",
-  order = 70,
-  leftAction = charJump("bolt"),
-  rightAction = charJump("mary", "aria")
+  name = "Bard's rules",
+  order = 70
 }
 
 PowerSettings.entitySchema.enum {
@@ -389,13 +437,12 @@ PowerSettings.entitySchema.enum {
   default = CREnum.Quatristate.DEFAULT
 }
 
-PowerSettings.entitySchema.action {
+PowerSettings.shared.header {
   id = "characters.mary",
-  name = "\3*cc5Mary's rules\3r",
+  name = "Mary's rules",
   order = 80,
-  leftAction = charJump("bard"),
-  rightAction = charJump("tempo"),
-  visibleIf = isAmplified
+  visibleIf = isAmplified(),
+  ignoredIf = isAmplified(false)
 }
 
 PowerSettings.entitySchema.enum {
@@ -405,16 +452,16 @@ PowerSettings.entitySchema.enum {
   order = 81,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
-  visibleIf = isAmplified
+  visibleIf = isAmplified(),
+  ignoredIf = isAmplified(false)
 }
 
-PowerSettings.entitySchema.action {
+PowerSettings.shared.header {
   id = "characters.tempo",
-  name = "\3*cc5Tempo's rules\3r",
+  name = "Tempo's rules",
   order = 90,
-  leftAction = charJump("mary"),
-  rightAction = charJump("aria"),
-  visibleIf = isAmplified
+  visibleIf = isAmplified(),
+  ignoredIf = isAmplified(false)
 }
 
 PowerSettings.entitySchema.enum {
@@ -424,7 +471,8 @@ PowerSettings.entitySchema.enum {
   order = 91,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
-  visibleIf = isAmplified
+  visibleIf = isAmplified(),
+  ignoredIf = isAmplified(false)
 }
 
 PowerSettings.entitySchema.number {
@@ -436,7 +484,8 @@ PowerSettings.entitySchema.number {
   minimum = 0,
   maximum = 999,
   editAsString = true,
-  visibleIf = isAdvancedAndAmplified,
+  visibleIf = both(isAdvanced(), isAmplified()),
+  ignoredIf = isAmplified(false),
   format = numberFormat(0)
 }
 
@@ -447,7 +496,8 @@ PowerSettings.entitySchema.enum {
   order = 93,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
-  visibleIf = isAmplified
+  visibleIf = isAmplified(),
+  ignoredIf = isAmplified(false)
 }
 
 PowerSettings.entitySchema.number {
@@ -455,7 +505,8 @@ PowerSettings.entitySchema.number {
   name = "Amount of damage",
   desc = "The amount of damage from the kill timer.",
   order = 94,
-  visibleIf = isAdvancedAndAmplified,
+  visibleIf = both(isAdvanced(), isAmplified()),
+  ignoredIf = isAmplified(false),
   default = 0,
   minimum = 0,
   maximum = 999,
@@ -467,7 +518,8 @@ PowerSettings.entitySchema.bitflag {
   name = "Type of damage",
   desc = "The type of damage from the kill timer.",
   order = 95,
-  visibleIf = isAdvancedAndAmplified,
+  visibleIf = both(isAdvanced(), isAmplified()),
+  ignoredIf = isAmplified(false),
   default = Damage.Type.SUICIDE,
   flags = Damage.Flag,
   presets = Damage.Type
@@ -587,7 +639,8 @@ PowerSettings.group {
   id = "inventory.curses",
   name = "Cursed inventory slots",
   desc = "Curse slots.",
-  order = 2
+  order = 2,
+  visibleIf = isAdvanced()
 }
 
 --#region Inventory curses settings--
@@ -597,6 +650,7 @@ PowerSettings.entitySchema.enum {
   name = "Consumable item",
   desc = "Curse the consumable item slot",
   order = 0,
+  visibleIf = isAdvanced(),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -606,6 +660,7 @@ PowerSettings.entitySchema.enum {
   name = "Shovel",
   desc = "Curse the shovel slot",
   order = 1,
+  visibleIf = isAdvanced(),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -615,6 +670,7 @@ PowerSettings.entitySchema.enum {
   name = "Weapon",
   desc = "Curse the weapon slot",
   order = 2,
+  visibleIf = isAdvanced(),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -624,6 +680,7 @@ PowerSettings.entitySchema.enum {
   name = "Body (armor)",
   desc = "Curse the body slot",
   order = 3,
+  visibleIf = isAdvanced(),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -633,6 +690,7 @@ PowerSettings.entitySchema.enum {
   name = "Head",
   desc = "Curse the head slot",
   order = 4,
+  visibleIf = isAdvanced(),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -642,6 +700,7 @@ PowerSettings.entitySchema.enum {
   name = "Feet",
   desc = "Curse the feet slot",
   order = 5,
+  visibleIf = isAdvanced(),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -651,6 +710,7 @@ PowerSettings.entitySchema.enum {
   name = "Torch",
   desc = "Curse the torch item slot",
   order = 6,
+  visibleIf = isAdvanced(),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -660,6 +720,7 @@ PowerSettings.entitySchema.enum {
   name = "Ring",
   desc = "Curse the ring slot",
   order = 7,
+  visibleIf = isAdvanced(),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -669,6 +730,7 @@ PowerSettings.entitySchema.enum {
   name = "Charms",
   desc = "Curse the charms slot",
   order = 8,
+  visibleIf = isAdvanced(),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -678,6 +740,7 @@ PowerSettings.entitySchema.enum {
   name = "Spell",
   desc = "Curse the spell slot",
   order = 9,
+  visibleIf = isAdvanced(),
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT
 }
@@ -696,24 +759,11 @@ PowerSettings.group {
 
 --#region HEALTH SETTINGS
 
-PowerSettings.entitySchema.number {
-  id = "health.amount",
-  name = "Amount of health",
-  desc = "The total amount of health to use.",
-  order = 0,
-  visibleIf = function() return not isAdvanced() end,
-  minimum = -1,
-  maximum = 10,
-  default = -1,
-  format = healthAmountFormat
-}
-
 PowerSettings.entitySchema.bool {
   id = "health.use",
   name = "Use these settings",
   desc = "Whether or not the below settings should apply.",
   order = 1,
-  visibleIf = isAdvanced,
   default = false
 }
 
@@ -725,8 +775,7 @@ PowerSettings.entitySchema.number {
   minimum = 1,
   default = 6,
   upperBound = "mod.CharRules.health.containers",
-  format = healthFormat,
-  visibleIf = isAdvanced
+  format = healthFormat
 }
 
 PowerSettings.entitySchema.number {
@@ -739,8 +788,7 @@ PowerSettings.entitySchema.number {
   upperBound = function()
     return get("health.limit") - get("health.cursed")
   end,
-  format = healthFormat,
-  visibleIf = isAdvanced
+  format = healthFormat
 }
 
 PowerSettings.entitySchema.number {
@@ -754,7 +802,7 @@ PowerSettings.entitySchema.number {
     return get("health.limit") - get("health.containers")
   end,
   format = zeroableHealthFormat,
-  visibleIf = isAdvancedAndAmplified
+  visibleIf = both(isAmplified(), isAdvanced())
 }
 
 PowerSettings.entitySchema.number {
@@ -767,8 +815,7 @@ PowerSettings.entitySchema.number {
   end,
   default = 20,
   maximum = 30,
-  format = healthFormat,
-  visibleIf = isAdvanced
+  format = healthFormat
 }
 
 --#endregion
@@ -778,7 +825,7 @@ PowerSettings.group {
   name = "Map generation settings",
   desc = "Settings that affect map generation",
   order = 5,
-  visibleIf = isAdvanced
+  visibleIf = isAdvanced()
 }
 
 --#region Map gen settings
@@ -790,7 +837,7 @@ PowerSettings.entitySchema.enum {
   order = 0,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
-  visibleIf = isAdvanced
+  visibleIf = isAdvanced()
 }
 
 PowerSettings.entitySchema.enum {
@@ -800,7 +847,7 @@ PowerSettings.entitySchema.enum {
   order = 1,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
-  visibleIf = isAdvanced
+  visibleIf = isAdvanced()
 }
 
 PowerSettings.entitySchema.enum {
@@ -810,7 +857,7 @@ PowerSettings.entitySchema.enum {
   order = 2,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
-  visibleIf = isAdvanced
+  visibleIf = isAdvanced()
 }
 
 PowerSettings.entitySchema.enum {
@@ -820,7 +867,7 @@ PowerSettings.entitySchema.enum {
   order = 3,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
-  visibleIf = isAdvanced
+  visibleIf = isAdvanced()
 }
 
 PowerSettings.entitySchema.enum {
@@ -830,7 +877,7 @@ PowerSettings.entitySchema.enum {
   order = 4,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
-  visibleIf = isAdvanced
+  visibleIf = isAdvanced()
 }
 
 PowerSettings.entitySchema.enum {
@@ -840,7 +887,7 @@ PowerSettings.entitySchema.enum {
   order = 5,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
-  visibleIf = isAdvanced
+  visibleIf = isAdvanced()
 }
 
 PowerSettings.entitySchema.enum {
@@ -850,7 +897,7 @@ PowerSettings.entitySchema.enum {
   order = 6,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
-  visibleIf = isAdvanced,
+  visibleIf = isAdvanced(),
   refreshOnChange = true
 }
 
@@ -862,9 +909,9 @@ PowerSettings.entitySchema.list.enum {
   enum = Boss.Type,
   default = { Boss.Type.NECRODANCER },
   itemDefault = Boss.Type.NECRODANCER,
-  visibleIf = function() return get("mapGen.storyBosses") == CREnum.Quatristate.RANDOM or
+  visibleIf = both(isAdvanced(), function() return get("mapGen.storyBosses") == CREnum.Quatristate.RANDOM or
         get("mapGen.storyBosses") == CREnum.Quatristate.YES
-  end
+  end)
 }
 
 --#endregion
@@ -874,7 +921,7 @@ PowerSettings.group {
   name = "Tweaks",
   desc = "Various tweaks that aren't exactly rules but might be helpful.",
   order = 6,
-  visibleIf = isAdvanced
+  visibleIf = isAdvanced()
 }
 
 --#region Tweaks
@@ -885,7 +932,7 @@ PowerSettings.shared.bool {
   desc = "Should the Golden Lute (boss) take damage from the Golden Lute (weapon)?",
   order = 1,
   default = false,
-  visibleIf = isAdvanced
+  visibleIf = isAdvanced()
 }
 
 --#endregion

@@ -92,9 +92,7 @@ Event.entitySchemaGenerate.add("checks", { order = "components", sequence = -1 }
   }
 end)
 
-Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", sequence = 2 }, function(ev)
-  if not ev.entity.playableCharacter then return end
-
+Event.entitySchemaLoadPlayer.add("charRulesComponents", { order = "overrides", sequence = 2 }, function(ev)
   local entity = ev.entity
 
   entity.inventoryBannedItems = entity.inventoryBannedItems or { components = {} }
@@ -117,7 +115,8 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
       entity.grooveChainInflictDamageOnDrop.damage = dmg
     end
   elseif rule == Tristate.NO then
-    entity.grooveChainInflictDamageOnDrop = false
+    entity.grooveChainInflictDamageOnDrop = entity.grooveChainInflictDamageOnDrop or {}
+    entity.grooveChainInflictDamageOnDrop.active = false
   end
 
   rule = getTristate("characters.bypassSarcophagus")
@@ -208,14 +207,6 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
   --#endregion
 
   --#region Bolt's settings
-  rule = CRSettings.get("characters.doubleTime")
-  if rule == Tristate.YES then
-    entity.rhythmSubdivision = entity.rhythmSubdivision or {}
-    entity.rhythmSubdivision.factor = 2
-  elseif rule == Tristate.NO then
-    entity.rhythmSubdivision = false
-  end
-
   if CRSettings.get("characters.customTempo") > 1 then
     entity.rhythmSubdivision = entity.rhythmSubdivision or {}
     entity.rhythmSubdivision.factor = CRSettings.get("characters.customTempo")
@@ -362,8 +353,10 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
   rule = getTristate("inventory.bans.poverty")
   if rule == Tristate.YES then
     comps.itemBanPoverty = ItemBanFlags
+    comps.itemBanKillPoverty = ItemBanFlags
   elseif rule == Tristate.NO then
     comps.itemBanPoverty = nil
+    comps.itemBanKillPoverty = nil
   end
 
   rule = getTristate("inventory.bans.weaponlocked")
@@ -462,19 +455,17 @@ Event.entitySchemaLoadEntity.add("charRulesComponents", { order = "overrides", s
   --#endregion
 
   --#region Health rules
-  if CRSettings.get("advanced") then
-    if CRSettings.get("health.use") then
-      entity.health = {
-        health = CRSettings.get("health.hearts"),
-        maxHealth = CRSettings.get("health.containers") - healthBoost
-      }
-      entity.cursedHealth = {
-        health = CRSettings.get("health.cursed")
-      }
-      entity.healthLimit = {
-        limit = CRSettings.get("health.limit")
-      }
-    end
+  if CRSettings.get("health.use") then
+    entity.health = {
+      health = CRSettings.get("health.hearts"),
+      maxHealth = CRSettings.get("health.containers") - healthBoost
+    }
+    entity.cursedHealth = {
+      health = CRSettings.get("health.cursed")
+    }
+    entity.healthLimit = {
+      limit = CRSettings.get("health.limit")
+    }
   end
   --#endregion
 
