@@ -1,29 +1,30 @@
+local Action  = require "necro.game.system.Action"
 local Enum    = require "system.utils.Enum"
 local ItemBan = require "necro.game.item.ItemBan"
 
 local module = {}
 
+local function entry(num, name, data)
+  data = data or {}
+  data.name = name
+  return Enum.entry(num, data)
+end
+
 -----------
 -- ENUMS --
 --#region--
 
-module.Inventory = Enum.sequence {
-  DISABLE = 0,
-  ADD = 1,
-  REPLACE = 2
-}
-
 module.Tristate = Enum.sequence {
-  NO = -1,
-  DEFAULT = 0,
-  YES = 1
+  NO      = entry(-1, "Disable"),
+  DEFAULT = entry(0, "Default"),
+  YES     = entry(1, "Enable")
 }
 
 module.Quatristate = Enum.sequence {
-  NO = -1,
-  DEFAULT = 0,
-  YES = 1,
-  RANDOM = 2
+  NO      = entry(-1, "Disable"),
+  DEFAULT = entry(0, "Default"),
+  YES     = entry(1, "Enable"),
+  RANDOM  = entry(2, "Randomize")
 }
 
 do
@@ -34,44 +35,112 @@ do
   local death = ItemBan.Flag.PICKUP_DEATH
   local fullDeath = bit.band(bit.bor(full, death), bit.bnot(ItemBan.Flag.PICKUP))
 
-  module.ItemBan = {
-    NONE = 0,
-    GENERATION = gen,
-    GENERATION_ALL = genAll,
-    LOCK = lock,
-    FULL = full,
-    PICKUP_DEATH = death,
-    FULL_DEADLY = fullDeath,
-    prettyNames = {
-      [0] = "No bans",
-      [gen] = "Don't generate except shrines",
-      [genAll] = "Don't generate ever",
-      [lock] = "Don't pickup or drop",
-      [full] = "Don't pickup, drop, or generate",
-      [death] = "Kill player on pickup",
-      [fullDeath] = "Don't drop or generate, kill on pickup"
-    }
+  module.ItemBan = Enum.sequence {
+    NONE           = entry(0, "No bans"),
+    GENERATION     = entry(gen, "Don't generate except shrines"),
+    GENERATION_ALL = entry(genAll, "Don't generate at all"),
+    LOCK           = entry(lock, "Don't pick up or drop"),
+    FULL           = entry(full, "Don't pick up, drop, or generate"),
+    PICKUP_DEATH   = entry(death, "Kill player on pickup"),
+    FULL_DEADLY    = entry(fullDeath, "Don't drop or generate, kill on pickup"),
   }
 end
 
 module.CharacterBitmask = {
-  CADENCE = 1,
-  MELODY = 2,
-  ARIA = 4,
-  DORIAN = 8,
-  ELI = 16,
-  MONK = 32,
-  DOVE = 64,
-  CODA = 128,
-  BOLT = 256,
-  BARD = 512,
+  CADENCE  = 1,
+  MELODY   = 2,
+  ARIA     = 4,
+  DORIAN   = 8,
+  ELI      = 16,
+  MONK     = 32,
+  DOVE     = 64,
+  CODA     = 128,
+  BOLT     = 256,
+  BARD     = 512,
   NOCTURNA = 1024,
-  DIAMOND = 2048,
-  MARY = 4096,
-  TEMPO = 8192,
+  DIAMOND  = 2048,
+  MARY     = 4096,
+  TEMPO    = 8192,
   -- REAPER=16384
 }
 
+do
+  local dir = Action.Direction
+  local spe = Action.Special
+
+  local actionSets = {
+    CHAR_DEFAULT = entry(0, "Character default"),
+
+    -- IGNORED:
+    --   Direction.UP_RIGHT
+    --   Direction.UP_LEFT
+    --   Direction.DOWN_LEFT
+    --   Direction.DOWN_RIGHT
+    -- REMAPPED:
+    --   nil
+    STANDARD = entry(1, "Standard movement", {
+      actionFilter = { ignoreActions = {
+        [dir.UP_RIGHT] = true,
+        [dir.UP_LEFT] = true,
+        [dir.DOWN_LEFT] = true,
+        [dir.DOWN_RIGHT] = true
+      } },
+      actionRemap = false
+    }),
+
+    -- Used by Diamond and Klarinetta.
+    --
+    -- IGNORED:
+    --   Special.ITEM_2
+    --   Special.THROW
+    --   Special.SPELL_1
+    --   Special.SPELL_2
+    -- REMAPPED:
+    --   Special.ITEM_1 <-> Special.ITEM_2
+    --   Special.BOMB   <-> Special.THROW
+    DIAMOND = entry(2, "Diamond movement (8-way + Item/bomb)", {
+      actionFilter = { ignoreActions = {
+        [spe.ITEM_2] = true,
+        [spe.THROW] = true,
+        [spe.SPELL_1] = true,
+        [spe.SPELL_2] = true
+      } },
+      actionRemap = { map = {
+        [spe.ITEM_1] = spe.ITEM_2,
+        [spe.ITEM_2] = spe.ITEM_1,
+        [spe.THROW] = spe.BOMB,
+        [spe.BOMB] = spe.THROW
+      } }
+    }),
+
+    -- IGNORED:
+    --   Special.ITEM_1
+    --   Special.ITEM_2
+    --   Special.THROW
+    --   Special.BOMB
+    -- REMAPPED:
+    --   Special.SPELL_1 <-> Special.ITEM_2
+    --   Special.SPELL_2 <-> Special.THROW
+    DIAMOND_2 = entry(3, "8-way + spells", {
+      actionFilter = { ignoreActions = {
+        [spe.ITEM_2] = true,
+        [spe.THROW] = true,
+        [spe.ITEM_1] = true,
+        [spe.BOMB] = true
+      } },
+      actionRemap = { map = {
+        [spe.SPELL_1] = spe.ITEM_2,
+        [spe.ITEM_2] = spe.SPELL_1,
+        [spe.THROW] = spe.SPELL_2,
+        [spe.SPELL_2] = spe.THROW
+      } }
+    })
+  }
+
+  module.ActionSets = Enum.sequence(actionSets)
+end
 --#endregion Enums
+
+print(module.ActionSets)
 
 return module

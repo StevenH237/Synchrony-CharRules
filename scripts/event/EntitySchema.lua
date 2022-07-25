@@ -2,6 +2,7 @@ local Event     = require "necro.event.Event"
 local ItemBan   = require "necro.game.item.ItemBan"
 local LevelExit = require "necro.game.tile.LevelExit"
 local RNG       = require "necro.game.system.RNG"
+local Utilities = require "system.utils.Utilities"
 
 local CRSettings = require "CharRules.Settings"
 local CREnum     = require "CharRules.Enum"
@@ -76,7 +77,7 @@ end
 Event.entitySchemaGenerate.add("checks", { order = "components", sequence = -1 }, function()
   RNGChannel = {
     state1 = 237,
-    state2 = 794824,
+    state2 = 242778437, -- "CHARRULES" on a keypad
     state3 = CRSettings.get("random")
   }
 
@@ -95,8 +96,12 @@ end)
 Event.entitySchemaLoadPlayer.add("charRulesComponents", { order = "overrides", sequence = 2 }, function(ev)
   local entity = ev.entity
 
+  if entity.name == nil then return end -- gdi reaper
+
   entity.inventoryBannedItems = entity.inventoryBannedItems or { components = {} }
   entity.inventoryBannedItems.components = entity.inventoryBannedItems.components or {}
+
+  entity.itemCollectorBannedPickupDamage = {}
 
   entity.bypassStairLock = entity.bypassStairLock or { level = 0 }
   entity.bypassStairLock.level = entity.bypassStairLock.level or LevelExit.StairLock.MINIBOSS
@@ -157,11 +162,11 @@ Event.entitySchemaLoadPlayer.add("charRulesComponents", { order = "overrides", s
   --#region Monk's Rules
   rule = getTristate("characters.poverty")
   if rule == Tristate.YES then
-    entity.inventoryBannedItems.components.itemCurrency = ItemBan.Flag.PICKUP_DEATH
+    entity.inventoryBannedItems.components.itemBanKillPoverty = ItemBan.Flag.PICKUP_DEATH
     entity.inventoryBannedItems.components.itemBanPoverty = ItemBan.Flag.GENERATION
     entity.goldHater = entity.goldHater or {}
   elseif rule == Tristate.NO then
-    entity.inventoryBannedItems.components.itemCurrency = 0
+    entity.inventoryBannedItems.components.itemBanKillPoverty = 0
     entity.inventoryBannedItems.components.itemBanPoverty = 0
     entity.goldHater = false
   end
@@ -212,13 +217,6 @@ Event.entitySchemaLoadPlayer.add("charRulesComponents", { order = "overrides", s
     entity.rhythmSubdivision.factor = CRSettings.get("characters.customTempo")
   elseif CRSettings.get("characters.customTempo") == 1 then
     entity.rhythmSubdivision = false
-  end
-
-  rule = CRSettings.get("characters.parityMovement")
-  if rule == Tristate.YES then
-    entity.Proto_parityActivation = entity.Proto_parityActivation or {}
-  elseif rule == Tristate.NO then
-    entity.Proto_parityActivation = false
   end
   --#endregion
 
@@ -281,6 +279,17 @@ Event.entitySchemaLoadPlayer.add("charRulesComponents", { order = "overrides", s
     entity.damageCountdownFlyaways = false
   end
   --#endregion
+  --#endregion
+
+  --#region Unspecific rules
+  local act = CRSettings.get("unspecific.actions")
+  print("Action set: " .. CREnum.ActionSets.data[act].name)
+  if act ~= CREnum.ActionSets.DEFAULT then
+    entity.actionFilter = Utilities.fastCopy(CREnum.ActionSets.data[act].actionFilter)
+    entity.actionRemap = Utilities.fastCopy(CREnum.ActionSets.data[act].actionRemap)
+    print(entity.actionFilter)
+    print(entity.actionRemap)
+  end
   --#endregion
 
   --#region Inventory rules

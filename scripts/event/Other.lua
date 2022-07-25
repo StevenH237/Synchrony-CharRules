@@ -5,12 +5,8 @@ local Entities = require "system.game.Entities"
 
 local CRSettings = require "CharRules.Settings"
 
-Event.objectTakeDamage.override("luteShield", 1, function(func, ev)
-  if CRSettings.get("tweaks.goldenLute") then
-    if not Damage.Flag.check(ev.type, Damage.Flag.GOLDEN_LUTE) then
-      return func(ev)
-    end
-  else
-    return func(ev)
+Event.objectTakeDamage.add("luteShieldBypass", { order = "shield", sequence = -1, filter = "luteHead" }, function(ev)
+  if Damage.Flag.check(ev.type, Damage.Flag.GOLDEN_LUTE) and CRSettings.get("tweaks.goldenLute") then
+    ev.type = Damage.Flag.mask(ev.type, Damage.Flag.STRENGTH_BASED)
   end
 end)

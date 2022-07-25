@@ -118,7 +118,7 @@ end
 
 local function isCharacterUnlocked(character)
   return function()
-    return true
+    return Progression.isUnlocked(Progression.UnlockType.PLAYABLE_CHARACTER, character) or get("characters.showAll")
   end
 end
 
@@ -131,7 +131,7 @@ local function anyCharacterLocked()
     end
 
     if isAmplified() then
-      for _, char in ipairs({ "Mary", "Tempo" }) do
+      for _, char in ipairs({ "Diamond", "Mary", "Tempo" }) do
         if Progression.isLocked(Progression.UnlockType.PLAYABLE_CHARACTER, char) then
           return true
         end
@@ -145,13 +145,6 @@ end
 -------------
 -- ACTIONS --
 --#region----
-
-local function charJump(char, noDLC)
-  if noDLC and not isAmplified() then
-    return function() Menu.selectByID("mod.CharRules.characters." .. noDLC) end
-  end
-  return function() Menu.selectByID("mod.CharRules.characters." .. char) end
-end
 
 --#endregion
 
@@ -411,17 +404,6 @@ PowerSettings.entitySchema.number {
   visibleIf = isCharacterUnlocked("Bolt")
 }
 
-PowerSettings.entitySchema.enum {
-  id = "characters.parityMovement",
-  name = "Parity movement",
-  desc = "Enemies move at normal tempo",
-  order = 63,
-  enum = CREnum.Quatristate,
-  default = CREnum.Quatristate.DEFAULT,
-  visibleIf = both(isCharacterUnlocked("Bolt"), isSynchrony()),
-  ignoredIf = isSynchrony(false)
-}
-
 PowerSettings.shared.header {
   id = "characters.bard",
   name = "Bard's rules",
@@ -438,18 +420,31 @@ PowerSettings.entitySchema.enum {
 }
 
 PowerSettings.shared.header {
+  id = "characters.diamond",
+  name = "Diamond's rules",
+  order = 80,
+  visibleIf = both(isAmplified(), isCharacterUnlocked("Diamond"))
+}
+
+PowerSettings.shared.label {
+  id = "characters.diamondLabel",
+  name = "Movement directions are under the \"Fun stuff\" category!",
+  order = 81,
+  visibleIf = both(isAmplified(), isCharacterUnlocked("Diamond"))
+}
+
+PowerSettings.shared.header {
   id = "characters.mary",
   name = "Mary's rules",
-  order = 80,
-  visibleIf = isAmplified(),
-  ignoredIf = isAmplified(false)
+  order = 90,
+  visibleIf = isAmplified()
 }
 
 PowerSettings.entitySchema.enum {
   id = "characters.marv",
   name = "Protect a sheep",
   desc = "A sheep follows you that must be kept alive",
-  order = 81,
+  order = 91,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
   visibleIf = isAmplified(),
@@ -459,16 +454,15 @@ PowerSettings.entitySchema.enum {
 PowerSettings.shared.header {
   id = "characters.tempo",
   name = "Tempo's rules",
-  order = 90,
-  visibleIf = isAmplified(),
-  ignoredIf = isAmplified(false)
+  order = 100,
+  visibleIf = isAmplified()
 }
 
 PowerSettings.entitySchema.enum {
   id = "characters.damageUp",
   name = "Increase damage",
   desc = "Should your attack damage be increased",
-  order = 91,
+  order = 101,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
   visibleIf = isAmplified(),
@@ -479,7 +473,7 @@ PowerSettings.entitySchema.number {
   id = "characters.damageUpAmount",
   name = "Damage increase amount",
   desc = "How much should your attack damage be increased",
-  order = 92,
+  order = 102,
   default = 0,
   minimum = 0,
   maximum = 999,
@@ -493,7 +487,7 @@ PowerSettings.entitySchema.enum {
   id = "characters.killTimer",
   name = "Kill timer",
   desc = "Must kill every few beats or you take damage",
-  order = 93,
+  order = 103,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
   visibleIf = isAmplified(),
@@ -504,7 +498,7 @@ PowerSettings.entitySchema.number {
   id = "characters.killTimerDamage",
   name = "Amount of damage",
   desc = "The amount of damage from the kill timer.",
-  order = 94,
+  order = 104,
   visibleIf = both(isAdvanced(), isAmplified()),
   ignoredIf = isAmplified(false),
   default = 0,
@@ -517,13 +511,35 @@ PowerSettings.entitySchema.bitflag {
   id = "characters.killTimerType",
   name = "Type of damage",
   desc = "The type of damage from the kill timer.",
-  order = 95,
+  order = 105,
   visibleIf = both(isAdvanced(), isAmplified()),
   ignoredIf = isAmplified(false),
   default = Damage.Type.SUICIDE,
   flags = Damage.Flag,
   presets = Damage.Type
 }
+--#endregion
+
+PowerSettings.group {
+  id = "unspecific",
+  name = "Unspecific rules",
+  desc = "Other rules that don't apply to specific characters",
+  order = 1.5,
+  visibleIf = isAdvanced(),
+}
+
+--#region UNSPECIFIC RULES--
+
+PowerSettings.entitySchema.enum {
+  id = "unspecific.actions",
+  name = "Allowed actions",
+  desc = "Which actions can the player take?",
+  order = 0,
+  visibleIf = isAdvanced(),
+  enum = CREnum.ActionSets,
+  default = CREnum.ActionSets.DEFAULT
+}
+
 --#endregion
 
 PowerSettings.group {
