@@ -71,13 +71,6 @@ do
   local actionSets = {
     CHAR_DEFAULT = entry(0, "Character default"),
 
-    -- IGNORED:
-    --   Direction.UP_RIGHT
-    --   Direction.UP_LEFT
-    --   Direction.DOWN_LEFT
-    --   Direction.DOWN_RIGHT
-    -- REMAPPED:
-    --   nil
     STANDARD = entry(1, "Standard movement", {
       actionFilter = { ignoreActions = {
         [dir.UP_RIGHT] = true,
@@ -89,15 +82,6 @@ do
     }),
 
     -- Used by Diamond and Klarinetta.
-    --
-    -- IGNORED:
-    --   Special.ITEM_2
-    --   Special.THROW
-    --   Special.SPELL_1
-    --   Special.SPELL_2
-    -- REMAPPED:
-    --   Special.ITEM_1 <-> Special.ITEM_2
-    --   Special.BOMB   <-> Special.THROW
     DIAMOND = entry(2, "Diamond movement (8-way + Item/bomb)", {
       actionFilter = { ignoreActions = {
         [spe.ITEM_2] = true,
@@ -113,14 +97,6 @@ do
       } }
     }),
 
-    -- IGNORED:
-    --   Special.ITEM_1
-    --   Special.ITEM_2
-    --   Special.THROW
-    --   Special.BOMB
-    -- REMAPPED:
-    --   Special.SPELL_1 <-> Special.ITEM_2
-    --   Special.SPELL_2 <-> Special.THROW
     DIAMOND_2 = entry(3, "8-way + spells", {
       actionFilter = { ignoreActions = {
         [spe.ITEM_2] = true,
@@ -134,13 +110,26 @@ do
         [spe.THROW] = spe.SPELL_2,
         [spe.SPELL_2] = spe.THROW
       } }
+    }),
+
+    SKEW = entry(4, "Skew (U-UR-D-DL)", {
+      actionFilter = { ignoreActions = {
+        [dir.LEFT] = true,
+        [dir.UP_LEFT] = true,
+        [dir.RIGHT] = true,
+        [dir.DOWN_RIGHT] = true
+      } },
+      actionRemap = { map = {
+        [dir.LEFT] = dir.DOWN_LEFT,
+        [dir.DOWN_LEFT] = dir.LEFT,
+        [dir.RIGHT] = dir.UP_RIGHT,
+        [dir.UP_RIGHT] = dir.RIGHT
+      } }
     })
   }
 
   module.ActionSets = Enum.sequence(actionSets)
 end
 --#endregion Enums
-
-print(module.ActionSets)
 
 return module

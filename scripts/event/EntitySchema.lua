@@ -1,8 +1,10 @@
-local Event     = require "necro.event.Event"
-local ItemBan   = require "necro.game.item.ItemBan"
-local LevelExit = require "necro.game.tile.LevelExit"
-local RNG       = require "necro.game.system.RNG"
-local Utilities = require "system.utils.Utilities"
+local Event           = require "necro.event.Event"
+local ItemBan         = require "necro.game.item.ItemBan"
+local LevelExit       = require "necro.game.tile.LevelExit"
+local RNG             = require "necro.game.system.RNG"
+local Settings        = require "necro.config.Settings"
+local SettingsStorage = require "necro.config.SettingsStorage"
+local Utilities       = require "system.utils.Utilities"
 
 local CRSettings = require "CharRules.Settings"
 local CREnum     = require "CharRules.Enum"
@@ -75,11 +77,11 @@ end
 --#region---
 
 Event.entitySchemaGenerate.add("checks", { order = "components", sequence = -1 }, function()
-  RNGChannel = {
-    state1 = 237,
-    state2 = 242778437, -- "CHARRULES" on a keypad
-    state3 = CRSettings.get("random")
-  }
+  RNGChannel = RNG.makeChannel(
+    237,
+    242778437, -- "CHARRULES" on a keypad
+    SettingsStorage.get("mod.CharRules.random", Settings.Layer.REMOTE_OVERRIDE)
+  )
 
   -- We'll do map gen rule calls *here* so that all characters are consistent
   MapGenRules = {
@@ -164,10 +166,12 @@ Event.entitySchemaLoadPlayer.add("charRulesComponents", { order = "overrides", s
   if rule == Tristate.YES then
     entity.inventoryBannedItems.components.itemBanKillPoverty = ItemBan.Flag.PICKUP_DEATH
     entity.inventoryBannedItems.components.itemBanPoverty = ItemBan.Flag.GENERATION
+    entity.inventoryBannedItems.components.CharRules_noGold = ItemBan.Flag.GENERATION
     entity.goldHater = entity.goldHater or {}
   elseif rule == Tristate.NO then
     entity.inventoryBannedItems.components.itemBanKillPoverty = 0
     entity.inventoryBannedItems.components.itemBanPoverty = 0
+    entity.inventoryBannedItems.components.CharRules_noGold = 0
     entity.goldHater = false
   end
 
@@ -283,12 +287,9 @@ Event.entitySchemaLoadPlayer.add("charRulesComponents", { order = "overrides", s
 
   --#region Unspecific rules
   local act = CRSettings.get("unspecific.actions")
-  print("Action set: " .. CREnum.ActionSets.data[act].name)
-  if act ~= CREnum.ActionSets.DEFAULT then
+  if act ~= CREnum.ActionSets.CHAR_DEFAULT then
     entity.actionFilter = Utilities.fastCopy(CREnum.ActionSets.data[act].actionFilter)
     entity.actionRemap = Utilities.fastCopy(CREnum.ActionSets.data[act].actionRemap)
-    print(entity.actionFilter)
-    print(entity.actionRemap)
   end
   --#endregion
 
@@ -362,10 +363,10 @@ Event.entitySchemaLoadPlayer.add("charRulesComponents", { order = "overrides", s
   rule = getTristate("inventory.bans.poverty")
   if rule == Tristate.YES then
     comps.itemBanPoverty = ItemBanFlags
-    comps.itemBanKillPoverty = ItemBanFlags
+    comps.CharRules_noGold = ItemBanFlags
   elseif rule == Tristate.NO then
     comps.itemBanPoverty = nil
-    comps.itemBanKillPoverty = nil
+    comps.CharRules_noGold = nil
   end
 
   rule = getTristate("inventory.bans.weaponlocked")
@@ -459,6 +460,13 @@ Event.entitySchemaLoadPlayer.add("charRulesComponents", { order = "overrides", s
     slots.spell = nil
   end
 
+  rule = getTristate("inventory.curses.shield")
+  if rule == Tristate.YES then
+    slots.shield = true
+  elseif rule == Tristate.NO then
+    slots.shield = nil
+  end
+
   entity.inventoryCursedSlots = cursedSlots
   --#endregion
   --#endregion
@@ -523,4 +531,10 @@ Event.entitySchemaLoadPlayer.add("charRulesComponents", { order = "overrides", s
   --#endregion
 end)
 
+Event.entitySchemaLoadEntity.add("charRulesNoRingGold", { order = "overrides", filter = "RingGold", sequence = 2 },
+  function(ev)
+    if ev.entity.name == "RingGold" or ev.entity.name == "RingGoldUncertain" then
+      ev.entity.CharRules_noGold = {}
+    end
+  end)
 --#endregion

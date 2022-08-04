@@ -428,7 +428,7 @@ PowerSettings.shared.header {
 
 PowerSettings.shared.label {
   id = "characters.diamondLabel",
-  name = "Movement directions are under the \"Fun stuff\" category!",
+  name = "Movement directions are under the \"Unspecific rules\" category!",
   order = 81,
   visibleIf = both(isAmplified(), isCharacterUnlocked("Diamond"))
 }
@@ -761,7 +761,15 @@ PowerSettings.entitySchema.enum {
   default = CREnum.Quatristate.DEFAULT
 }
 
-
+PowerSettings.entitySchema.enum {
+  id = "inventory.curses.shield",
+  name = "Shield",
+  desc = "Curse the shield slot",
+  order = 10,
+  visibleIf = both(isAdvanced(), isSynchrony()),
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
 --#endregion
 
 --#endregion
@@ -853,6 +861,7 @@ PowerSettings.entitySchema.enum {
   order = 0,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
+  visibility = Settings.Visibility.HIDDEN, -- not working, hiding for now
   visibleIf = isAdvanced()
 }
 
@@ -863,6 +872,7 @@ PowerSettings.entitySchema.enum {
   order = 1,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
+  visibility = Settings.Visibility.HIDDEN, -- not working, hiding for now
   visibleIf = isAdvanced()
 }
 
@@ -913,6 +923,7 @@ PowerSettings.entitySchema.enum {
   order = 6,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
+  visibility = Settings.Visibility.HIDDEN, -- this one's deprecated
   visibleIf = isAdvanced(),
   refreshOnChange = true
 }
@@ -925,6 +936,7 @@ PowerSettings.entitySchema.list.enum {
   enum = Boss.Type,
   default = { Boss.Type.NECRODANCER },
   itemDefault = Boss.Type.NECRODANCER,
+  visibility = Settings.Visibility.HIDDEN, -- not working, hiding for now
   visibleIf = both(isAdvanced(), function() return get("mapGen.storyBosses") == CREnum.Quatristate.RANDOM or
         get("mapGen.storyBosses") == CREnum.Quatristate.YES
   end)
