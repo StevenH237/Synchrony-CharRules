@@ -1,0 +1,1 @@
+The default rules for each characters will be added soon!
