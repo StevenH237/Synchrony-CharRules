@@ -1,1 +1,0 @@
-* If the character's health is set higher than their max health, the higher health will be used anyway, but not appear.

@@ -1,116 +1,101 @@
-All of these options have a default value that doesn't modify how the game works, so if you don't check the options (Esc menu → Custom rules → Mod settings → Char rules), the mod won't change anything.
+Character Rules doesn't change anything by default. You have to modify settings under Custom Rules for this mod to have any effect. The settings are documented below.
 
-All options applied with the mod apply to all players, and "the character" represents all of them.
+Advanced settings are listed on this page. If you have not enabled "Show advanced settings" in the main Custom Rules menu, non-bolded options do not appear.
 
-It's undefined whether these settings change 
+A "quatristate" has four possible settings:
+* **Default**: This rule is unchanged - characters that normally have it have it, and characters that don't don't. Which settings are enabled for which characters by default is listed on [this page](Defaults.md).
+* **Enable**: This rule is enabled for all characters.
+* **Disable**: This rule is disabled for all characters.
+* **Randomize**: This rule is applied randomly to characters. Note that it is applied the same way to all players of the same character.
 
-# Health options
-These settings change how the character's health behaves. Note that health values are all measured in half hearts, with whole hearts displayed for convenience. Additionally, values set to 0 will be replaced by the character's default.
+# Character-specific rules
+**Tips:** You can use the left-right arrow keys on section headers to jump between the sections!
 
-* **Starting health**: The character's starting health. If it's set higher than "Starting max health" (or the character's default), the higher starting health will still apply, but not appear.
-* **Starting max health**: The character's starting max health (heart containers).
-* **Starting cursed health**: The character's starting cursed health. This is 0 for all vanilla characters, but may be set anyway.
-* **Max health limit**: The highest the character's health can go. This is 1 for Aria and Coda, and 20 for all other vanilla characters. The total of max health and cursed health cannot be raised above this during gameplay, but may start higher (though note that attempting to raise it when it's already higher will drop it to the limit).
+**Note:** Rules relating to items aren't shown in here; go to the [Inventory](#inventory) section to set those.
 
-## Invincibility options
-These settings change how invincibility works for the character. This invincibility does not apply to any self-inflicted blood-related damage or to suicide damage (e.g. Tempo's Curse).
+## Aria's rules
+* **Damage on missed beat**: (Quatristate) If enabled, the character takes half a heart of damage from a missed beat.
+* Amount of damage: The amount of damage caused by a missed beat.
+* Type of damage: The type of damage caused by a missed beat.
+* Bypass sarcophagus: (Quatristate) If enabled, exits are unlocked after the miniboss is killed even on floors with a sarcophagus.
 
-* **Enabled**:
-  * **No**: The character can't receive any kind of invincibility frames, such as from food or being hit. This excludes shielding.
-  * **Yes**: The character can receive invincibility frames. This is the default for all vanilla characters.
-  * **Permanent**: The character is permanently invincible.
-* **On hit**: The character receives this many beats of invincibility after taking a hit.
-* **On level start**: The character receives this many beats of invincibility when the level starts.
+## Dorian's rules
+* **Boots of painful leaping**: (Quatristate) If enabled, the character takes half a heart of damage when moving with disabled Boots of Leaping/Lunging.
+* Amount of damage: The amount of damage caused by a short step.
+* Type of damage: The type of damage caused by a short step.
 
-# Inventory settings
-These settings change the items which players start with or may receive. All three of these fields are space-separated lists, or use just a single space to make it an empty list.
+## Eli's rules
+* **Empty shop walls**: (Quatristate) If enabled, shop walls do **not** drop gold when destroyed.
 
-By default, the values you enter will *override* character default values. However, you can *add* values by starting the list with a `+` (by itself), and you can remove items by putting a `-` before the items you want to remove. Attempting to remove an item that's not in the default list does nothing, and attempting to both remove and add an item results in it being added.
+## Monk's rules
+* **Vow of poverty**: (Quatristate) If enabled, picking up gold kills the character. (This also bans the Ring of Gold for this character.)
+* **Free items from shops**: (Quatristate) If enabled, the character can get one item from each shop for free.
+* **Collect gold on stairs**: (Quatristate) If enabled, the character automatically collects all gold on the floor when going down the stairs.
+* **All enemies drop gold**: (Quatristate) If enabled, all enemies killed by this character drop by at least one gold, including mushrooms, cauldrons, and boss enemies.
 
-* **Starting inventory**: The items with which the character starts. Note that vanilla ND items have IDs in `PascalCase` rather than `snake_case` - for example, the basic dagger is `WeaponDagger` rather than `weapon_dagger`. For mod items, prefix the mod's name, underscore, the item's ID - and you may have to ask the mod's developer what that ID is.
-* **Banned components**: For advanced users, you may remove items with given components from the item pool here. Be careful — if you ban your weapon, you can't pick it up if it's thrown!
-* **Cursed slots**: Slots that are cursed cannot change the item (or lack thereof) that is present within them. The slot IDs you can use here are "head", "shovel", "feet", "weapon", "body" (armor), "torch", "ring", "action" (consumable items), "spell", "misc" (charms), "bomb", or "hud".
+## Dove's rules
+* **Teleporting bombs**: (Quatristate) If enabled, this character's bombs teleport enemies instead of damaging them.
+* **Bypass miniboss**: (Quatristate) If enabled, the exit stairs are automatically unlocked without killing the miniboss.
 
-# Rhythm settings
-These settings change how the rhythm of the game is played.
+## Bolt's rules
+* **Tempo multiplier**: If set, all characters must play at this tempo multiplier, regardless of whether or not they're Bolt. (This can be up to 20.)
 
-* **Fixed-beat mode**: This setting takes its name from the same setting in Cadence of Hyrule, even though the mod's author believes it to be contradictorily named. Enabling this setting *removes* the requirement that the character move to the beat.
-* **Beat multiplier**: This setting allows all characters to play to the same speed of beats. 
-* **On song end**: For characters whose songs end, this setting lets you change what happens — either they move to the next floor, or they die.
+## Bard's rules
+* **Ignore rhythm**: (Quatristate) If enabled, the character does not have to move to the beat.
 
-# Groove chain settings
-This category contains two sets of settings. Please note, "Groove chain" is synonymous with "Coin multiplier" or "Obsidian damage".
+## Mary's rules
+*Only with Amplified DLC installed and enabled.*
 
-## Groove chain level settings
-These settings change how you earn levels of the groove chain.
+* **Protect a sheep**: (Quatristate) If enabled, the character is followed by a sheep.
 
-* **Kills for first level**: How many kills you have to score without breaking combo to move up from 1x to 2x groove chain. All vanilla characters use "1" for this setting.
-* **Kills for later levels**: How many kills you have to score without breaking combo to move up further levels of groove chain, besides from 1x to 2x. All vanilla characters use "4" for this setting.
-* **Available levels**: How many total levels are available. All vanilla characters use "3" for this setting, and please note that setting this value higher than 3 does not play nicely with Obsidian sprites (though the items will still work as expected).
+## Tempo's rules
+*Only with Amplified DLC installed and enabled.*
 
-## Drop damage penalty settings
-These settings change the penalty for missed beat (i.e. Aria, Coda).
+* **Increase damage**: (Quatristate) If enabled, this character has inherent damage increase.
+* Damage increase amount: The amount by which to increase damage. Defaults to 999.
+* **Kill timer**: (Quatristate) If enabled, this character must kill every 17 beats or they die.
+* Amount of damage: The amount of damage taken when the timer expires.
+* Type of damage: The type of damage taken when the timer expires.
 
-* **Active**: Whether or not the damage penalty is active.
-* **Damage amount**: How much damage missing the beat causes. This need not be lethal damage, it just happens that 1 is lethal for the only characters that get this by default.
+# Unspecific rules
+*Advanced settings view only.*
 
-# Gold settings
-These settings play around with how the character interacts with gold.
+* Allowed actions: Which actions can a character take?
+  * Standard movement: The default for most characters.
+  * Diamond movement: The default for Diamond (Amplified DLC). Klarinetta (Synchrony DLC) also uses this.
+  * 8-way + spells: Like Diamond, but the spells are usable instead of item/bomb.
+  * Skew: Left and right movement move diagonally instead.
 
-* **Starting gold**: Should be self-explanatory.
-* **Gold kills on pickup**: Gold kills the player whenever it is picked up. This also enables a couple related behaviors, for example Leprechauns will drop 0 gold instead of 100 when killed, and the Earth spell will clear gold.
-* **Minimum gold drops**: All enemies drop at least this much gold when killed, even if they normally drop 0.
-* **Free items from shops**: When this setting is enabled, the character may take one item for free from shops.
+# Inventory
 
-# Damage countdown
-These settings deal with Tempo's Curse.
+## Items
+* **Clear inventory**: If checked, all characters will have their inventory cleared before items are added below.
+* **Give items**: Items in this list are given to all players. If they replace default items from the character, those items are dropped (unless Clear is checked).
 
-* **Active**: Whether or not the damage countdown is active.
-* **Damage amount**: How much damage hitting 0 on the countdown causes. This need not be lethal damage, although it defaults to such.
-* **Countdown time**: How many beats you get between kills. Note that this number is *one higher* than the highest you'll ever see on the timer itself, for example Tempo's default is 17.
+## Bans
+All of these are quatristates. If enabled, the affected items cannot be generated or picked up by the character. These should be self-explanatory.
 
-# Damage options
-This setting just lets you deal more damage! :D
+## Cursed inventory slots
+*Advanced settings view only.*
 
-* **Damage increase**: Increases the amount of damage dealt by the player.
+All of these are quatristates. When a setting is enabled, that slot is cursed, preventing the item in that slot from being changed whatsoever.
 
-# Allowed actions
-These settings let you change which actions you're allowed to take.
+# Health settings
+* **Use these settings**: If checked, all characters have their starting health as determined by this page. If not checked, nothing else on this page has any effect.
+* **Starting health**: The number of filled heart containers the characters start with.
+* **Health containers**: The number of total (filled + empty) heart containers the characters start with.
+* Cursed health: *Amplified DLC required.* The number of cursed heart containers the characters start with.
+* **Health limit**: The maximum number of heart containers the characters can have.
 
-* **Item 1**: Your first item, used with `Q` under the default controls.
-* **Item 2 / Switch**: Your second item, used with `W` under the default controls. This is also the button for switching weapons with the Holster.
-* **Bomb**: Bombs, used with `A` under the default controls.
-* **Throw / Toggle**: `S` under the default controls, which can throw daggers and spears, reload guns and crossbows, and toggle boots.
-* **Spell 1**: The first spell, used with `E` under the default controls.
-* **Spell 2**: The second spell, used with `D` under the default controls.
+# Map generation settings
+*Advanced settings view only. Note: Settings set to random are applied consistently to all characters, giving them a 50% chance to affect each run regardless of party size.*
 
-## Movement directions
-These settings let you change which directions you're allowed to move.
+* Skip gold in vaults: Gold in walls and vaults does not spawn.
+* Reverse zone order: Fight through zones 5 to 1 (4 to 1 without Amplified).
+* Skip boss fights: Skip boss fights at the end of each zone.
+* Smaller shops: Remove one item from every main shop.
 
-# Misc settings
-These are just the rest of the settings.
+# Tweaks
+*Advanced settings view only.*
 
-* **Damage on untoggled movement**: If the character is holding a toggleable item, they take half a heart of damage when that item is turned off.
-* **Lamb follower**: Adds Marv, Mary's lamb, for all characters.
-
-## Level exit settings
-These affect level exit bypasses:
-
-* **Require miniboss**: If yes, the miniboss must be defeated before the exit stairs are usable.
-* **Require sarcophagus**: If yes, on a floor with a sarcophagus, the sarcophagus must be removed before the exit stairs are usable.
-
-## Vision settings
-These affect what you can see:
-
-* **All tile vision**: When enabled, the player can see the full map.
-* **Limit object vision range**: When enabled, the player can only see entities (items, enemies, trips) within this range.
-* **Limit tile vision range**: When enabled, the player can only see tiles within this range. This does not imply the limited object vision above.
-
-### Component-based vision
-These settings affect what things you can see:
-
-* **Use these settings**: This must be "Yes" for the settings on this page to take effect.
-* **Monocle sight**: Are items visible, as if you're wearing a Monocle?
-* **Telepathy sight**: Are enemies visible, as if you're wearing a Crown of Telepathy?
-* **Trapsight**: Are traps visible, as if you're holding a Torch of Foresight?
-* **Other components**: If entered here, any entities with these components are visible from afar.
+* Golden lute damages golden lute: If enabled, the Golden Lute (item) causes damage to the Golden Lute (boss), so that Melody can take part in Aria's story boss.
