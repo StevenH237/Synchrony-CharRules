@@ -9,6 +9,8 @@ local Progression     = require "necro.game.system.Progression"
 local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
 
+local Text = require "CharRules.i18n.Text"
+
 local PowerSettings = require "PowerSettings.PowerSettings"
 
 local CREnum = require "CharRules.Enum"
@@ -39,30 +41,26 @@ local function numberFormat(def, off, dis)
   dis = dis or nil
 
   return function(val)
-    if val == def then return "(Default)" end
-    if val == dis then return "(Disabled)" end
+    if val == def then return Text.Formats.Default end
+    if val == dis then return Text.Formats.Disabled end
     val = val + off
     return tostring(val)
   end
 end
 
 local function healthFormat(amt)
-  if amt == 0 then return "(Default)" end
-  if amt <= 2 then return amt .. " (" .. (amt / 2) .. " heart)" end
-  return amt .. " (" .. (amt / 2) .. " hearts)"
+  if amt == 0 then return Text.Formats.Default end
+  if amt == 1 then return Text.Formats.Hearts05 end
+  if amt == 2 then return Text.Formats.Hearts1 end
+  if amt == 3 then return Text.Formats.Hearts15 end
+  if amt == 4 then return Text.Formats.Hearts2 end
+  if amt == 5 then return Text.Formats.Hearts25 end
+  return Text.Formats.HeartsPlus(amt, amt / 2)
 end
 
 local function zeroableHealthFormat(amt)
-  if amt == 0 then return "(None)" end
-  if amt <= 2 then return amt .. " (" .. (amt / 2) .. " heart)" end
-  return amt .. " (" .. (amt / 2) .. " hearts)"
-end
-
-local function healthAmountFormat(value)
-  if value == -1 then return "(Default)"
-  elseif value == 0 then return "Half a heart"
-  elseif value == 1 then return "1 heart"
-  else return value .. " hearts" end
+  if amt == 0 then return Text.Formats.None end
+  return healthFormat(amt)
 end
 
 --#endregion Formatters

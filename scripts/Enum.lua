@@ -2,6 +2,10 @@ local Action  = require "necro.game.system.Action"
 local Enum    = require "system.utils.Enum"
 local ItemBan = require "necro.game.item.ItemBan"
 
+local Text = require "CharRules.i18n.Text"
+
+local NLText = require "NixLib.i18n.Text"
+
 local module = {}
 
 local function entry(num, name, data)
@@ -15,16 +19,16 @@ end
 --#region--
 
 module.Tristate = Enum.sequence {
-  NO      = entry(-1, "Disable"),
-  DEFAULT = entry(0, "Default"),
-  YES     = entry(1, "Enable")
+  NO      = entry(-1, NLText.Disable),
+  DEFAULT = entry(0, NLText.Default),
+  YES     = entry(1, NLText.Enable)
 }
 
 module.Quatristate = Enum.sequence {
-  NO      = entry(-1, "Disable"),
-  DEFAULT = entry(0, "Default"),
-  YES     = entry(1, "Enable"),
-  RANDOM  = entry(2, "Randomize")
+  NO      = entry(-1, NLText.Disable),
+  DEFAULT = entry(0, NLText.Default),
+  YES     = entry(1, NLText.Enable),
+  RANDOM  = entry(2, NLText.Randomize)
 }
 
 do
@@ -36,13 +40,13 @@ do
   local fullDeath = bit.band(bit.bor(full, death), bit.bnot(ItemBan.Flag.PICKUP))
 
   module.ItemBan = Enum.sequence {
-    NONE           = entry(0, "No bans"),
-    GENERATION     = entry(gen, "Don't generate except shrines"),
-    GENERATION_ALL = entry(genAll, "Don't generate at all"),
-    LOCK           = entry(lock, "Don't pick up or drop"),
-    FULL           = entry(full, "Don't pick up, drop, or generate"),
-    PICKUP_DEATH   = entry(death, "Kill player on pickup"),
-    FULL_DEADLY    = entry(fullDeath, "Don't drop or generate, kill on pickup"),
+    NONE           = entry(0, Text.ItemBans.None),
+    GENERATION     = entry(gen, Text.ItemBans.Generation),
+    GENERATION_ALL = entry(genAll, Text.ItemBans.GenerationAll),
+    LOCK           = entry(lock, Text.ItemBans.Lock),
+    FULL           = entry(full, Text.ItemBans.Full),
+    PICKUP_DEATH   = entry(death, Text.ItemBans.PickupDeath),
+    FULL_DEADLY    = entry(fullDeath, Text.ItemBans.FullDeadly),
   }
 end
 
@@ -69,9 +73,9 @@ do
   local spe = Action.Special
 
   local actionSets = {
-    CHAR_DEFAULT = entry(0, "Character default"),
+    CHAR_DEFAULT = entry(0, Text.ActionSets.CharDefault),
 
-    STANDARD = entry(1, "Standard movement", {
+    STANDARD = entry(1, Text.ActionSets.Standard, {
       actionFilter = { ignoreActions = {
         [dir.UP_RIGHT] = true,
         [dir.UP_LEFT] = true,
@@ -82,7 +86,7 @@ do
     }),
 
     -- Used by Diamond and Klarinetta.
-    DIAMOND = entry(2, "Diamond movement (8-way + Item/bomb)", {
+    DIAMOND = entry(2, Text.ActionSets.Diamond, {
       actionFilter = { ignoreActions = {
         [spe.ITEM_2] = true,
         [spe.THROW] = true,
@@ -97,7 +101,7 @@ do
       } }
     }),
 
-    DIAMOND_2 = entry(3, "8-way + spells", {
+    DIAMOND_2 = entry(3, Text.ActionSets.Diamond2, {
       actionFilter = { ignoreActions = {
         [spe.ITEM_2] = true,
         [spe.THROW] = true,
@@ -112,7 +116,7 @@ do
       } }
     }),
 
-    SKEW = entry(4, "Skew (U-UR-D-DL)", {
+    SKEW = entry(4, Text.ActionSets.Skew, {
       actionFilter = { ignoreActions = {
         [dir.LEFT] = true,
         [dir.UP_LEFT] = true,
