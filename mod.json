@@ -6,7 +6,7 @@
 	"description": "Modifies gameplay rules using options for individual characters' rules.",
 	"author": "Nixill",
 	"dependencies": {"PowerSettings_io_2237104":true},
-	"api": {"scriptPath":"scripts"},
+	"api": {"scriptPath":""},
 	"icon": "CharRulesIcon.png",
 	"banner": "CharRulesBanner.png",
 	"tags": [],
