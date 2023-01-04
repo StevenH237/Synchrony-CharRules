@@ -418,23 +418,38 @@ PowerSettings.entitySchema.enum {
 }
 
 PowerSettings.shared.header {
+  id = "characters.reaper",
+  name = "Reaper's rules",
+  order = 80
+}
+
+PowerSettings.entitySchema.enum {
+  id = "characters.spawnSouls",
+  name = "Spawn souls on kills",
+  desc = "Should souls spawn from killed enemies?",
+  order = 81,
+  enum = CREnum.Quatristate,
+  default = CREnum.Quatristate.DEFAULT
+}
+
+PowerSettings.shared.header {
   id = "characters.diamond",
   name = "Diamond's rules",
-  order = 80,
+  order = 90,
   visibleIf = both(isAmplified(), isCharacterUnlocked("Diamond"))
 }
 
 PowerSettings.shared.label {
   id = "characters.diamondLabel",
   name = "Movement directions are under the \"Unspecific rules\" category!",
-  order = 81,
+  order = 91,
   visibleIf = both(isAmplified(), isCharacterUnlocked("Diamond"))
 }
 
 PowerSettings.shared.header {
   id = "characters.mary",
   name = "Mary's rules",
-  order = 90,
+  order = 100,
   visibleIf = isAmplified()
 }
 
@@ -442,7 +457,7 @@ PowerSettings.entitySchema.enum {
   id = "characters.marv",
   name = "Protect a sheep",
   desc = "A sheep follows you that must be kept alive",
-  order = 91,
+  order = 101,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
   visibleIf = isAmplified(),
@@ -452,7 +467,7 @@ PowerSettings.entitySchema.enum {
 PowerSettings.shared.header {
   id = "characters.tempo",
   name = "Tempo's rules",
-  order = 100,
+  order = 110,
   visibleIf = isAmplified()
 }
 
@@ -460,7 +475,7 @@ PowerSettings.entitySchema.enum {
   id = "characters.damageUp",
   name = "Increase damage",
   desc = "Should your attack damage be increased",
-  order = 101,
+  order = 111,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
   visibleIf = isAmplified(),
@@ -471,7 +486,7 @@ PowerSettings.entitySchema.number {
   id = "characters.damageUpAmount",
   name = "Damage increase amount",
   desc = "How much should your attack damage be increased",
-  order = 102,
+  order = 112,
   default = 0,
   minimum = 0,
   maximum = 999,
@@ -485,7 +500,7 @@ PowerSettings.entitySchema.enum {
   id = "characters.killTimer",
   name = "Kill timer",
   desc = "Must kill every few beats or you take damage",
-  order = 103,
+  order = 113,
   enum = CREnum.Quatristate,
   default = CREnum.Quatristate.DEFAULT,
   visibleIf = isAmplified(),
@@ -496,7 +511,7 @@ PowerSettings.entitySchema.number {
   id = "characters.killTimerDamage",
   name = "Amount of damage",
   desc = "The amount of damage from the kill timer.",
-  order = 104,
+  order = 114,
   visibleIf = both(isAdvanced(), isAmplified()),
   ignoredIf = isAmplified(false),
   default = 0,
@@ -509,7 +524,7 @@ PowerSettings.entitySchema.bitflag {
   id = "characters.killTimerType",
   name = "Type of damage",
   desc = "The type of damage from the kill timer.",
-  order = 105,
+  order = 115,
   visibleIf = both(isAdvanced(), isAmplified()),
   ignoredIf = isAmplified(false),
   default = Damage.Type.SUICIDE,
