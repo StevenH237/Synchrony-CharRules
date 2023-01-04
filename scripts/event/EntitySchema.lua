@@ -225,7 +225,7 @@ Event.entitySchemaLoadPlayer.add("charRulesComponents", { order = "overrides", s
   --#endregion
 
   --#region Bard's settings
-  rule = CRSettings.get("characters.noBeats")
+  rule = getTristate("characters.noBeats")
   if rule == Tristate.YES then
     entity.rhythmIgnored = entity.rhythmIgnored or {}
     entity.rhythmIgnoredTemporarily = false
@@ -237,8 +237,23 @@ Event.entitySchemaLoadPlayer.add("charRulesComponents", { order = "overrides", s
   end
   --#endregion
 
+  --#region Reaper's settings
+  rule = getTristate("characters.spawnSouls")
+  if rule == Tristate.YES then
+    entity.spawnSoulOnKill = entity.spawnSoulOnKill or { soulType = "ReaperSoul" }
+    entity.soulLeader = {}
+    entity.soulLeaderAnimation = entity.soulLeaderAnimation or { variantCount = 8 }
+    entity.soulLeaderSpriteMirrorX = entity.soulLeaderSpriteMirrorX or { leftFacing = true, mirrorX = -1 }
+  elseif rule == Tristate.NO then
+    entity.spawnSoulOnKill = false
+    entity.soulLeader = false
+    entity.soulLeaderAnimation = false
+    entity.soulLeaderSpriteMirrorX = false
+  end
+  --#endregion
+
   --#region Mary's settings
-  rule = CRSettings.get("characters.marv")
+  rule = getTristate("characters.marv")
   if rule == Tristate.YES then
     entity.characterWithFollower = { followerType = "Marv" }
   elseif rule == Tristate.NO then
@@ -249,7 +264,7 @@ Event.entitySchemaLoadPlayer.add("charRulesComponents", { order = "overrides", s
   --#endregion
 
   --#region Tempo's settings
-  rule = CRSettings.get("characters.damageUp")
+  rule = getTristate("characters.damageUp")
   if rule == Tristate.YES then
     entity.damageIncrease = entity.damageIncrease or { damage = 999 }
     if CRSettings.get("characters.damageUpAmount") > 0 then
@@ -259,7 +274,7 @@ Event.entitySchemaLoadPlayer.add("charRulesComponents", { order = "overrides", s
     entity.damageIncrease = {}
   end
 
-  rule = CRSettings.get("characters.killTimer")
+  rule = getTristate("characters.killTimer")
   if rule == Tristate.YES then
     entity.damageCountdown = entity.damageCountdown or {}
     entity.damageCountdown.countdownReset = entity.damageCountdown.countdownReset or 17
