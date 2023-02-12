@@ -1,11 +1,11 @@
 {
 	"namespace": "CharRules",
 	"displayName": "Character Rules",
-	"version": "3.2.0",
+	"version": "4.0.0",
 	"synchronyVersion": "3.4.0",
 	"description": "Modifies gameplay rules using options for individual characters' rules.",
 	"author": "Nixill",
-	"dependencies": {"PowerSettings_io_2237104":true},
+	"dependencies": {},
 	"api": {"scriptPath":""},
 	"icon": "CharRulesIcon.png",
 	"banner": "CharRulesBanner.png",
@@ -15,6 +15,6 @@
 	"homepageURL": "https://mod.io/g/crypt/m/CharRules",
 	"modioID": "2257221",
 	"modioUserID": 12939888,
-	"pendingVersion": "3.2.0",
+	"pendingVersion": "4.0.0",
 	"visibility": 0
 }
